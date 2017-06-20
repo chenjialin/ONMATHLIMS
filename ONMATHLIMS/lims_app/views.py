@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 import os
 # Create your views here.
+CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def welcome(request):
@@ -22,5 +23,16 @@ def project_input(request):
             return HttpResponseRedirect(reverse("welcome"))
     else:
         form = SampleProjectMasterForm()
-    CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'project_input.html'), {'form': form})
+
+
+def main(request):
+    username = "陈中旭"
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
+                  {'username': username})
+
+
+def receive_sample(request):
+    username = "陈中旭"
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
+                  {'username': username})
