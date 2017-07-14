@@ -163,7 +163,7 @@ class SampleProjectMaster(models.Model):
     status = models.CharField(max_length=45, blank=True, null=True)
     created_by = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.CharField(max_length=45, blank=True, null=True)
-    project_log = models.TextField(blank=True, null=True)
+    #project_log = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
