@@ -239,6 +239,9 @@ class UserInfo(models.Model):
     field = models.CharField(max_length=100, blank=True, null=True)
     notes = models.CharField(max_length=200, blank=True, null=True)
 
+    def get_password(self):
+        return self.password
+
     class Meta:
         managed = False
         db_table = 'user_info'
