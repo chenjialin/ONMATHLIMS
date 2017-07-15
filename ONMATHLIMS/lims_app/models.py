@@ -163,7 +163,7 @@ class SampleProjectMaster(models.Model):
     status = models.CharField(max_length=45, blank=True, null=True)
     created_by = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.CharField(max_length=45, blank=True, null=True)
-    project_log = models.TextField(blank=True, null=True)
+    #project_log = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -238,6 +238,9 @@ class UserInfo(models.Model):
     status = models.CharField(max_length=45, blank=True, null=True)
     field = models.CharField(max_length=100, blank=True, null=True)
     notes = models.CharField(max_length=200, blank=True, null=True)
+
+    def get_password(self):
+        return self.password
 
     class Meta:
         managed = False
