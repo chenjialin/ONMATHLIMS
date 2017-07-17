@@ -149,7 +149,7 @@ class SamplePacketInformation(models.Model):
 
 
 class SampleProjectMaster(models.Model):
-    project_number = models.IntegerField(unique=True, blank=True, null=True)
+    project_number = models.CharField(max_length=45, unique=True, blank=True, null=True)
     project_name = models.TextField(blank=True, null=True)
     cust_organization = models.TextField(blank=True, null=True)
     cust_user = models.CharField(max_length=45, blank=True, null=True)
