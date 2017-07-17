@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+from . import DbObjectDoesNotExist
 from django.http import HttpResponse, HttpResponseRedirect
 from forms import SampleProjectMasterForm, UserForm
 from django.core.urlresolvers import reverse
@@ -68,11 +68,27 @@ def receive_sample(request):
 
 
 def project_view(request):
+    msg = 'request is not post!'
     if request.method == 'POST':
-        action = request.POST['action']
-        '''
-        if action == 'edit':
-            project_master_info =
-        '''
-        data = " ".join(['ajax', 'work!', 'action', 'is', action])
-    return HttpResponse({json.dumps(data)})
+        project_master_info = {}
+        for key, value in request.POST.items():
+            project_master_info[key] = value
+
+        if project_master_info['action'] == 'edit':
+            new_project_master_info = SampleProjectMaster(id=project_master_info['id'],
+                                                          project_number=project_master_info[u'项目编号'],
+                                                          cust_user=project_master_info[u'客户名称'],
+                                                          status=project_master_info[u'状态'],
+                                                          create_time=project_master_info[u'创建时间'])
+            new_project_master_info.save()
+            msg = 'update success!'
+        elif  project_master_info['action'] == 'delete':
+            try:
+                old_project_master_info = SampleProjectMaster.objects.get(id=project_master_info['id'])
+                old_project_master_info.delete()
+            except DbObjectDoesNotExist, e:
+                msg = 'nothing to delete!'
+            msg = 'delete success!'
+        else:
+            msg = 'do nothing!'
+    return HttpResponse({json.dumps(msg)})
