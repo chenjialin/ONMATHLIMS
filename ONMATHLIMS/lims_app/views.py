@@ -34,6 +34,11 @@ def logout(request):
 
 
 def project_input(request):
+    username = COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
     if request.method == "POST":
         form = SampleProjectMasterForm(request.POST)
         if form.is_valid():
@@ -47,6 +52,10 @@ def project_input(request):
 
 def main(request):
     username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
     all_projects = SampleProjectMaster.objects.all()
     all_projects_list = []
     for each_project in all_projects:
@@ -61,13 +70,12 @@ def main(request):
                   {'username': username, 'all_projects': all_projects_list})
 
 
-def receive_sample(request):
-    username = request.COOKIES.get('username', '')
-    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
-                  {'username': username})
-
-
 def project_view(request):
+    username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
     msg = 'request is not post!'
     if request.method == 'POST':
         project_master_info = {}
@@ -92,3 +100,22 @@ def project_view(request):
         else:
             msg = 'do nothing!'
     return HttpResponse({json.dumps(msg)})
+
+
+def receive_sample(request):
+    username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
+                  {'username': username})
+
+
+def quality_check(request):
+    username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'), {'username': username})
