@@ -3,7 +3,7 @@
 {% block content_header %}
 <h1>样品接收</h1>
 <ol class="breadcrumb">
-    <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li><a href="{% url 'main' %}"><i class="fa fa-dashboard"></i> Home</a></li>
     <li class="active">样品接收</li>
 </ol>
 {% endblock %}
@@ -27,7 +27,6 @@
                     <li onclick="select_project('{{ 0 }}', '我的所有项目')"><a>我负责的所有项目</a></li>
                   </ul>
                 </div>
-
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
                         <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">

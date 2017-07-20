@@ -27,22 +27,28 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
-                <table class="table table-hover">
+                <table id="test" class="table table-hover">
                     <tr>
+                        <th>#</th>
                         <th>项目编号</th>
-                        <th>客户姓名</th>
-                        <th>修改日期</th>
+                        <th>客户名称</th>
+                        <th>创建时间</th>
                         <th>状态</th>
                         <th>备注</th>
                     </tr>
+                    {% for project in all_projects %}
                     <tr>
-                        <td>OMPJ-001</td>
-                        <td>John Doe</td>
-                        <td>11-7-2014</td>
-                        <td><span class="label label-success">Approved</span></td>
+                        <td>{{project.id}}</td>
+                        <td>{{project.project_number}}</td>
+                        <td>{{project.cust_user}}</td>
+                        <td>{{project.create_time}}</td>
+                        <td>{{project.status}}</td>
                         <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
                     </tr>
+                    {% endfor %}
+                    <!--
                     <tr>
+                        <td>2</td>
                         <td>OMPJ-001</td>
                         <td>Alexander Pierce</td>
                         <td>11-7-2014</td>
@@ -50,6 +56,7 @@
                         <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
                     </tr>
                     <tr>
+                        <td>3</td>
                         <td>OMPJ-001</td>
                         <td>Bob Doe</td>
                         <td>11-7-2014</td>
@@ -57,12 +64,14 @@
                         <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
                     </tr>
                     <tr>
+                        <td>4</td>
                         <td>OMPJ-001</td>
                         <td>Mike Doe</td>
                         <td>11-7-2014</td>
                         <td><span class="label label-danger">Denied</span></td>
                         <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
                     </tr>
+                  -->
                 </table>
             </div>
             <!-- /.box-body -->
@@ -77,6 +86,35 @@
     $(document).ready(function(){
         $(".tree >li").removeClass('active');
         $("#all_project").addClass('active');
-    });
+        $("#test").Tabledit({
+          url: "{% url 'project_view' %}",
+          columns: {
+            identifier: [0, 'id'],
+            editable: [[1, '项目编号'], [2, '客户名称'], [3,'创建时间'], [4, '状态'], [5,'备注']]
+          },
+          onDraw: function(){
+            console.log('onDraw()');
+          },
+          onSuccess: function(data, textStatus, jqXHR) {
+            console.log('onSuccess(data, textStatus, jqXHR)');
+            console.log(data);
+            console.log(textStatus);
+            console.log(jqXHR);
+      },
+          onFail: function(jqXHR, textStatus, errorThrown) {
+            console.log('onFail(jqXHR, textStatus, errorThrown)');
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+      },
+          onAlways: function() {
+            console.log('onAlways()');
+      },
+          onAjax: function(action, serialize) {
+            console.log('onAjax(action, serialize)');
+            console.log(action);
+      }
+    })
+  });
 </script>
 {% endblock %}

@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'SEQ_SA_INFO',                      # Or path to database file if using sqlite3.
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': '050400',
         'HOST': '127.0.0.1',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '3306',                      # Set to empty string for default.
     }
@@ -129,6 +129,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_URL = '/lims_app/static/'
+# STATIC_URL = '/lims_app/static/'
 
 SERIALIZATION_MODULES = {'json': 'wadofstuff.django.serializers.json'}
+STATIC_URL = '/static/'
