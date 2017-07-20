@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render
 from models import UserInfo, SampleProjectMaster
 
+
 import os
 import json
 # Create your views here.
@@ -119,3 +120,16 @@ def quality_check(request):
         return response
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'), {'username': username})
+
+
+def upload_file(request):
+    username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
+    table = request.GET.get('table', '')
+    table_map = {'quality_check': u'质检', 'build_lib': u'建库', 'upmachine': u'上机', 'downmachine': u'下机'}
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upload.html'),
+    {'username': username, 'table': table, 'table_name': table_map.get(table, u'表格')})

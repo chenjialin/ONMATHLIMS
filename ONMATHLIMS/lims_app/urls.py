@@ -9,4 +9,6 @@ urlpatterns = [
     url(r'^logout/', views.logout, name='logout'),
     url(r'^project_view/', views.project_view, name='project_view'),
     url(r'^quality_check/', views.quality_check, name='quality_check'),
+    url(r'^upload/', views.upload_file, name='upload'),
+    url(r'^upload/(?P<table>\w+)/$', views.upload_file, name='upload'),
 ]
