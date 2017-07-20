@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from forms import SampleProjectMasterForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
+
+from interface import receive_sample_ini
+
 import os
 # Create your views here.
 CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -34,5 +37,25 @@ def main(request):
 
 def receive_sample(request):
     username = "陈中旭"
+    all_proj_info = receive_sample_ini.get_all_proj_info()
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
-                  {'username': username})
+                  {'username': username, 'proj_info': all_proj_info, 'sample_info': []})
+
+
+# def get_sample_by_project(request):
+#     project_id = request.POST['project_id']
+#     sample_info = receive_sample_ini.get_sample_by_project(project_id)
+#
+#     return JsonResponse(sample_info, safe=False)
+
+
+def get_sample_by_project2(request):
+    print '--------------------'
+    username = "陈中旭"
+    # project_id = request.POST['project_id']
+    project_id = 1
+    all_proj_info = receive_sample_ini.get_all_proj_info()
+    sample_info = receive_sample_ini.get_sample_by_project2(project_id)
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
+                  {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info})
