@@ -36,6 +36,8 @@
     <script src="static/js/html5shiv.min.js"></script>
     <script src="static/js/respond.min.js"></script>
     <![endif]-->
+    {%block header_script %}
+    {% endblock %}
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
 <div class="wrapper">
@@ -137,15 +139,17 @@
             <ul class="sidebar-menu" data-widget="tree">
                 <li class="header">MAIN NAVIGATION</li>
                 <li class="active" id="all_project"><a href="/lims_app/main"><i class="fa fa-book"></i> <span>项目总览</span></a></li>
-                <li id="receive_sample"><a href="/lims_app/receive_sample"><i class="fa fa-book"></i> <span>接收样品</span></a></li>
-                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>质检样品</span></a></li>
-                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>建库</span></a></li>
-                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>测序</span></a></li>
-                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>数据快递</span></a></li>
+                <li id="receive_sample"><a href="/lims_app/receive_sample"><i class="fa fa-book"></i> <span>样品接收</span></a></li>
+                <li id="quality_check"><a href="/lims_app/quality_check"><i class="fa fa-book"></i> <span>样品质检</span></a></li>
+                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>样品建库</span></a></li>
+                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>样品上机</span></a></li>
+                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>样品下机</span></a></li>
+                <!--
                 <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>分析</span></a></li>
                 <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>发送报告</span></a></li>
                 <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>项目结束</span></a></li>
                 <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>样品回寄</span></a></li>
+                -->
             </ul>
         </section>
         <!-- /.sidebar -->
@@ -417,9 +421,6 @@
 <script src="{%  static "dist/js/demo.js" %}"></script>
 
 {% block page_script %}
-<script>
-
-</script>
 {% endblock %}
 </body>
 
