@@ -5,6 +5,7 @@
 #   * Make sure each ForeignKey has `on_delete` set to the desired behavior.
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+# coding:utf-8
 from __future__ import unicode_literals
 
 from django.db import models
@@ -80,40 +81,33 @@ class RnaSampleSequencingType(models.Model):
 
 
 class SampleInfoDetail(models.Model):
-    id_alias = models.CharField(unique=True, max_length=45, blank=True, null=True)
     project_id = models.IntegerField()
-    sample_name = models.CharField(max_length=50, blank=True, null=True)
-    product_num = models.CharField(max_length=50, blank=True, null=True)
-    concentration = models.CharField(max_length=50, blank=True, null=True)
-    volume = models.CharField(max_length=50, blank=True, null=True)
-    od_260_or_280 = models.CharField(max_length=50, blank=True, null=True)
-    pre_time = models.CharField(max_length=50, blank=True, null=True)
-    database_type = models.CharField(max_length=50, blank=True, null=True)
-    data_quantity = models.CharField(max_length=50, blank=True, null=True)
-    quality_inspection = models.CharField(max_length=50, blank=True, null=True)
-    any_single_num = models.CharField(max_length=50, blank=True, null=True)
-    sample_number = models.CharField(max_length=50, blank=True, null=True)
-    library_name = models.CharField(max_length=50, blank=True, null=True)
-    index_num = models.CharField(max_length=50, blank=True, null=True)
-    index_sequence = models.CharField(max_length=50, blank=True, null=True)
-    library_type = models.CharField(max_length=50, blank=True, null=True)
-    length_of_gel = models.CharField(max_length=50, blank=True, null=True)
-    fragment_length = models.CharField(max_length=50, blank=True, null=True)
-    library_volume = models.CharField(max_length=50, blank=True, null=True)
-    data_size = models.CharField(max_length=50, blank=True, null=True)
-    wg_cid = models.CharField(max_length=50, blank=True, null=True)
-    lib_id = models.CharField(max_length=50, blank=True, null=True)
-    sample_type = models.CharField(max_length=50, blank=True, null=True)
-    q_rcb = models.CharField(max_length=50, blank=True, null=True)
-    od = models.CharField(max_length=50, blank=True, null=True)
-    rin = models.CharField(max_length=50, blank=True, null=True)
-    lib_size = models.CharField(max_length=50, blank=True, null=True)
-    qty = models.CharField(max_length=50, blank=True, null=True)
-    original_sample_name = models.CharField(max_length=50, blank=True, null=True)
-    project_id_e = models.CharField(max_length=50, blank=True, null=True)
-    yield_field = models.CharField(db_column='yield', max_length=50, blank=True, null=True)  # Field renamed because it was a Python reserved word.
-    reads = models.CharField(max_length=50, blank=True, null=True)
-
+    project_number = models.CharField(max_length=45, unique=True)
+    sample_name = models.CharField(max_length=45)
+    sample_id = models.CharField(max_length=45, unique=True)
+    express_number = models.CharField(max_length=45, blank=True, null=True)
+    product_num = models.CharField(max_length=45, blank=True, null=True)
+    sendsample_time = models.CharField(max_length=45, blank=True, null=True)
+    sendsample_comment = models.CharField(max_length=100, blank=True, null=True)
+    rin = models.CharField(max_length=45, blank=True, null=True)
+    concentration = models.CharField(max_length=45, blank=True, null=True)
+    volume = models.CharField(max_length=45, blank=True, null=True)
+    qualitycheck_results = models.CharField(max_length=1, blank=True, null=True)
+    qualitycheck_time = models.CharField(max_length=45, blank=True, null=True)
+    qualitycheck_comment = models.CharField(max_length=100, blank=True, null=True)
+    lib_id = models.CharField(max_length=45, blank=True, null=True)
+    lib_time = models.CharField(max_length=45, blank=True, null=True)
+    lib_comment = models.CharField(max_length=100, blank=True, null=True)
+    upmachine_type = models.CharField(max_length=45, blank=True, null=True)
+    upmachine_mode = models.CharField(max_length=45, blank=True, null=True)
+    upmachine_num = models.CharField(max_length=45, blank=True, null=True)
+    upmachine_time = models.CharField(max_length=45, blank=True, null=True)
+    upmachine_comment = models.CharField(max_length=100, blank=True, null=True)
+    downmachine_num = models.CharField(max_length=45, blank=True, null=True)
+    q20 = models.CharField(max_length=45, blank=True, null=True)
+    q30 = models.CharField(max_length=45, blank=True, null=True)
+    downmachine_time = models.CharField(max_length=45, blank=True, null=True)
+    downmachine_comment = models.CharField(max_length=100, blank=True, null=True)
     class Meta:
         managed = False
         db_table = 'sample_info_detail'
@@ -149,7 +143,7 @@ class SamplePacketInformation(models.Model):
 
 
 class SampleProjectMaster(models.Model):
-    project_number = models.IntegerField(unique=True, blank=True, null=True)
+    project_number = models.CharField(max_length=45, unique=True, blank=True, null=True)
     project_name = models.TextField(blank=True, null=True)
     cust_organization = models.TextField(blank=True, null=True)
     cust_user = models.CharField(max_length=45, blank=True, null=True)
@@ -163,7 +157,7 @@ class SampleProjectMaster(models.Model):
     status = models.CharField(max_length=45, blank=True, null=True)
     created_by = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.CharField(max_length=45, blank=True, null=True)
-    project_log = models.TextField(blank=True, null=True)
+    #project_log = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -238,6 +232,9 @@ class UserInfo(models.Model):
     status = models.CharField(max_length=45, blank=True, null=True)
     field = models.CharField(max_length=100, blank=True, null=True)
     notes = models.CharField(max_length=200, blank=True, null=True)
+
+    def get_password(self):
+        return self.password
 
     class Meta:
         managed = False
