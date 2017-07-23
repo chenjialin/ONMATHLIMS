@@ -1,47 +1,36 @@
 # coding: utf8
-def get_all_proj_info():
+from django.db import connection
 
-    return [('1', 'OMPJ-001'), ('2', 'OMPJ-002'), ('3', 'OMPJ-003'), ('4', 'OMPJ-004')]
+
+def get_proj_name_by_id(project_id):
+    cmd = "SELECT project_number FROM sample_project_master where id='%s'" % project_id
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    result = cursor.fetchone()
+
+    return result[0] if result else "请选择项目"
+
+
+def get_all_proj_info():
+    cmd = "select id, project_number from sample_project_master"
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    result = cursor.fetchall()
+
+    return result
 
 
 def get_sample_by_project(project_id):
     """
-    <th>样品编号</th>
-                        <th>所属项目</th>
-                        <th>快递编号</th>
-                        <th>修改日期</th>
-                        <!--<th>状态</th>-->
-                        <th>样品备注</th>
-
     :param project_id:
     :return:
     """
-    # smaple_id, project_name
-    return [
-        {'sample_id': 1, 'proj_name': 'OMPJ-001', 'express': '1111111', 'date': '11-7-2014', 'notes': '样品备注1'},
-        {'sample_id': 2, 'proj_name': 'OMPJ-001', 'express': '22222', 'date': '11-7-2014', 'notes': '样品备注2'},
-        {'sample_id': 3, 'proj_name': 'OMPJ-001', 'express': '33333', 'date': '11-7-2014', 'notes': '样品备注3'},
-        {'sample_id': 4, 'proj_name': 'OMPJ-001', 'express': '4444', 'date': '11-7-2014', 'notes': '样品备注4'},
+    cmd = """select d.id sample_id, d.sample_name, m.project_name, express_number, sendsample_time, sendsample_comment 
+              from sample_info_detail d inner join sample_project_master m on m.id=d.project_id
+             where project_id='%s' """ % project_id
 
-    ]
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    result = cursor.fetchall()
 
-
-def get_sample_by_project2(project_id):
-    """
-    <th>样品编号</th>
-                        <th>所属项目</th>
-                        <th>快递编号</th>
-                        <th>修改日期</th>
-                        <!--<th>状态</th>-->
-                        <th>样品备注</th>
-
-    :param project_id:
-    :return:
-    """
-    # smaple_id, project_name
-    return [
-        (1, 1, 'OMPJ-001', '1111111', '11-7-2014', '样品备注1'),
-        (2, 2, 'OMPJ-002', '2222', '11-7-2014', '样品备注3'),
-        (3, 3, 'OMPJ-003', '333', '11-7-2014', '样品备注2'),
-        (4, 4, 'OMPJ-004', '4444', '11-7-2014', '样品备注2'),
-    ]
+    return result
