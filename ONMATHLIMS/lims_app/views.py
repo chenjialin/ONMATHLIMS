@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from models import UserInfo, SampleProjectMaster, SampleInfoDetail
 from interface import receive_sample_ini, search_result_ini
-
+from tables import ProjectViewTable
 reload(sys)
 sys.setdefaultencoding('utf8')
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
@@ -91,8 +91,9 @@ def main(request):
             project_dict['status'] = each_project.status
             project_dict['cust_user'] = each_project.cust_user
             all_projects_list.append(project_dict)
+        show_projects = ProjectViewTable(all_projects_list)
         return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
-                      {'username': username, 'all_projects': all_projects_list})
+                      {'username': username, 'all_projects': show_projects})
 
 
 def project_view(request):
