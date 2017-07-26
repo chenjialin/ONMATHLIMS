@@ -29,6 +29,9 @@
     <link rel="stylesheet" href="{% static "plugins/daterangepicker/daterangepicker.css" %}">
     <!-- bootstrap wysihtml5 - text editor -->
     <link rel="stylesheet" href="{% static "plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css" %}">
+    <!-- jquery.datatables -->
+    <link rel="stylesheet" href="{% static "plugins/datatables/dataTables.bootstrap.css" %}">
+    <!--<link rel="stylesheet" href="{% static "plugins/datatables/dataTables.bootstrap.css" %}"> -->
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -123,9 +126,9 @@
                 <li class="active" id="all_project"><a href="/lims_app/main"><i class="fa fa-book"></i> <span>项目总览</span></a></li>
                 <li id="receive_sample"><a href="/lims_app/receive_sample"><i class="fa fa-book"></i> <span>样品接收</span></a></li>
                 <li id="quality_check"><a href="/lims_app/quality_check"><i class="fa fa-book"></i> <span>样品质检</span></a></li>
-                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>样品建库</span></a></li>
-                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>样品上机</span></a></li>
-                <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>样品下机</span></a></li>
+                <li id="build_lib"><a href="/lims_app/build_lib"><i class="fa fa-book"></i> <span>样品建库</span></a></li>
+                <li id="upmachine"><a href="/lims_app/upmachine"><i class="fa fa-book"></i> <span>样品上机</span></a></li>
+                <li id="downmachine"><a href="/lims_app/downmachine"><i class="fa fa-book"></i> <span>样品下机</span></a></li>
                 <!--
                 <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>分析</span></a></li>
                 <li><a href="documentation/index.html"><i class="fa fa-book"></i> <span>发送报告</span></a></li>
@@ -399,7 +402,9 @@
 <script src="{%  static "dist/js/adminlte.min.js" %}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{%  static "dist/js/demo.js" %}"></script>
-
+<!-- datatable -->
+<script src="{%  static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{%  static "plugins/datatables/dataTables.bootstrap.js" %}"></script>
 {% block page_css %}
 {% endblock %}
 

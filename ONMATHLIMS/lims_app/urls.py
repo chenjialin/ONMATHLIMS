@@ -8,9 +8,9 @@ urlpatterns = [
     url(r'^login/', views.login, name='login'),
     url(r'^logout/', views.logout, name='logout'),
     url(r'^search/', views.search, name='search'),
-    url(r'^project_view/', views.project_view, name='project_view'),
     url(r'^save_sample_info', views.save_sample_info, name='save_sample_info'),
     url(r'^quality_check/', views.quality_check, name='quality_check'),
-    url(r'^upload/', views.upload_file, name='upload'),
-    url(r'^upload/(?P<table>\w+)/$', views.upload_file, name='upload'),
+    url(r'^build_lib/', views.build_lib, name='build_lib'),
+    url(r'^upmachine/', views.upmachine, name='upmachine'),
+    url(r'^downmachine/', views.downmachine, name='downmachine'),
 ]
