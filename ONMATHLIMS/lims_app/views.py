@@ -10,8 +10,7 @@ from forms import SampleProjectMasterForm, UserForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from models import UserInfo, SampleProjectMaster, SampleInfoDetail
-from interface import receive_sample_ini, search_result_ini
-from tables import ProjectViewTable
+from interface import search_result_ini, get_sample_info
 reload(sys)
 sys.setdefaultencoding('utf8')
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
@@ -91,11 +90,11 @@ def main(request):
             project_dict['status'] = each_project.status
             project_dict['cust_user'] = each_project.cust_user
             all_projects_list.append(project_dict)
-        show_projects = ProjectViewTable(all_projects_list)
         return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
-                      {'username': username, 'all_projects': show_projects})
+                      {'username': username, 'all_projects': all_projects_list})
 
 
+'''
 def project_view(request):
     username = request.COOKIES.get('username', '')
     if not username:
@@ -126,6 +125,35 @@ def project_view(request):
         else:
             msg = 'do nothing!'
     return HttpResponse({json.dumps(msg)})
+'''
+
+'''
+view function for onmathlims modules
+'''
+
+'''
+def generate_view(view):
+    def func(request, view):
+        username = request.COOKIES.get('username', '')
+        if not username:
+            response = HttpResponseRedirect('/lims_app/login/')
+            return response
+
+        if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+            key_word = request.GET.get('q')
+            response = HttpResponseRedirect('lims_app/search?q=%s' %key_word)
+            return response
+
+        project_id = request.GET.get('project_id', '') or 0
+        all_proj_info = get_sample_info.get_all_proj_info()
+        sample_info = get_sample_info.get_sample_by_project(project_id, name=view)
+        select_proj = get_sample_info.get_proj_name_by_id(project_id)
+
+        return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', view + '.html'),
+                      {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
+                       'select_proj': select_proj})
+    return func
+'''
 
 
 def receive_sample(request):
@@ -133,10 +161,15 @@ def receive_sample(request):
     if not username:
         response = HttpResponseRedirect('/lims_app/login/')
         return response
+
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+
     project_id = request.GET.get('project_id', '') or 0
-    all_proj_info = receive_sample_ini.get_all_proj_info()
-    sample_info = receive_sample_ini.get_sample_by_project(project_id)
-    select_proj = receive_sample_ini.get_proj_name_by_id(project_id)
+    all_proj_info = get_sample_info.get_all_proj_info()
+    sample_info = get_sample_info.get_sample_by_project(project_id, name='receive_sample')
+    select_proj = get_sample_info.get_proj_name_by_id(project_id)
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
@@ -149,20 +182,63 @@ def quality_check(request):
         response = HttpResponseRedirect('/lims_app/login/')
         return response
 
-    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'), {'username': username})
+    project_id = request.GET.get('project_id', '') or 0
+    all_proj_info = get_sample_info.get_all_proj_info()
+    sample_info = get_sample_info.get_sample_by_project(project_id, name='quality_check')
+    select_proj = get_sample_info.get_proj_name_by_id(project_id)
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'),
+                  {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
+                   'select_proj': select_proj})
 
 
-def upload_file(request):
+def build_lib(request):
     username = request.COOKIES.get('username', '')
     if not username:
         response = HttpResponseRedirect('/lims_app/login/')
         return response
 
-    table = request.GET.get('table', '')
-    table_map = {'quality_check': u'质检', 'build_lib': u'建库', 'upmachine': u'上机', 'downmachine': u'下机'}
+    project_id = request.GET.get('project_id', '') or 0
+    all_proj_info = get_sample_info.get_all_proj_info()
+    sample_info = get_sample_info.get_sample_by_project(project_id, name='build_lib')
+    select_proj = get_sample_info.get_proj_name_by_id(project_id)
 
-    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upload.html'),
-    {'username': username, 'table': table, 'table_name': table_map.get(table, u'表格')})
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'build_lib.html'),
+                    {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
+                     'select_proj': select_proj})
+
+
+def upmachine(request):
+    username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
+
+    project_id = request.GET.get('project_id', '') or 0
+    all_proj_info = get_sample_info.get_all_proj_info()
+    sample_info = get_sample_info.get_sample_by_project(project_id, name='upmachine')
+    select_proj = get_sample_info.get_proj_name_by_id(project_id)
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upmachine.html'),
+                    {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
+                     'select_proj': select_proj})
+
+
+def downmachine(request):
+    username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
+    project_id = request.GET.get('project_id', '') or 0
+    all_proj_info = get_sample_info.get_all_proj_info()
+    sample_info = get_sample_info.get_sample_by_project(project_id, name='downmachine')
+    select_proj = get_sample_info.get_proj_name_by_id(project_id)
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'downmachine.html'),
+                    {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
+                     'select_proj': select_proj})
 
 
 def save_sample_info(request):
@@ -170,8 +246,18 @@ def save_sample_info(request):
     if not username:
         response = HttpResponseRedirect('/lims_app/login/')
         return response
+    table_name = request.GET.get('table')
     sample_id = request.POST['name']
     value = request.POST['value']
-    SampleInfoDetail.objects.filter(id=sample_id.replace('sample_id_', '')).update(express_number=value)
+    if table_name == 'receive_sample':
+        SampleInfoDetail.objects.filter(id=sample_id.replace('sample_id_', '')).update(sendsample_comment=value)
+    elif table_name == 'quality_check':
+        SampleInfoDetail.objects.filter(id=sample_id.replace('sample_id_', '')).update(qualitycheck_comment=value)
+    elif table_name == 'build_lib':
+        SampleInfoDetail.objects.filter(id=sample_id.replace('sample_id_', '')).update(lib_comment=value)
+    elif table_name == 'upmachine':
+        SampleInfoDetail.objects.filter(id=sample_id.replace('sample_id_', '')).update(upmachine_comment=value)
+    elif table_name == 'downmachine':
+        SampleInfoDetail.objects.filter(id=sample_id.replace('sample_id_', '')).update(downmachine_comment=value)
 
     return JsonResponse({'msg': 'ok'})
