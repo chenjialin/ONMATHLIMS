@@ -14,31 +14,30 @@
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
+              <!--
                 <h3 class="box-title">Ｍy Project</h3>
 
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
                         <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
-
                         <div class="input-group-btn">
                             <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
-            {% render_table all_projects %}
-            {% comment %}
-            <!--
-            <div class="box-body table-responsive no-padding">
-                <table id="test" class="table table-hover">
+            <div class="box-body">
+                <table id="test" class="table table-bordered table-striped">
+                  <thead>
                     <tr>
                         <th>#</th>
                         <th>项目编号</th>
                         <th>客户名称</th>
                         <th>创建时间</th>
                         <th>状态</th>
-                        <th>备注</th>
                     </tr>
+                  </thead>
+                  <tbody>
                     {% for project in all_projects %}
                     <tr>
                         <td>{{project.id}}</td>
@@ -46,46 +45,20 @@
                         <td>{{project.cust_user}}</td>
                         <td>{{project.create_time}}</td>
                         <td>{{project.status}}</td>
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
                     </tr>
                     {% endfor %}
-                    <tr>
-                        <td>2</td>
-                        <td>OMPJ-001</td>
-                        <td>Alexander Pierce</td>
-                        <td>11-7-2014</td>
-                        <td><span class="label label-warning">Pending</span></td>
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>OMPJ-001</td>
-                        <td>Bob Doe</td>
-                        <td>11-7-2014</td>
-                        <td><span class="label label-primary">Approved</span></td>
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>OMPJ-001</td>
-                        <td>Mike Doe</td>
-                        <td>11-7-2014</td>
-                        <td><span class="label label-danger">Denied</span></td>
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                    </tr>
+                  </tbody>
                 </table>
             </div>
-          -->
-        {% endcomment %}
         </div>
-        <!-- /.box -->
     </div>
 </div>
 {% endblock %}
-
 {% block page_script %}
 <script>
     $(document).ready(function(){
+      {% comment %}
+      /*
         $(".tree >li").removeClass('active');
         $("#all_project").addClass('active');
         $("#test").Tabledit({
@@ -116,7 +89,9 @@
             console.log('onAjax(action, serialize)');
             console.log(action);
       }
-    })
+    })*/
+    {% endcomment %}
+      $("#test").DataTable();
   });
 </script>
 {% endblock %}

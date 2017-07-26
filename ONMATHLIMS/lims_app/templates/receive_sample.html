@@ -27,6 +27,7 @@
 {#                    <li onclick="select_project('all')"><a>我负责的所有项目</a></li>#}
                   </ul>
                 </div>
+                <!--
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
                         <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
@@ -36,26 +37,33 @@
                         </div>
                     </div>
                 </div>
+              -->
             </div>
             <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-                <table class="table table-hover" id="sample_table">
+            <div class="box-body">
+                <table class="table table-responsive no-padding" id="sample_table">
+                  <thead>
                     <tr>
-                        <th>样品编号</th>
+                        <th>样品名称</th>
                         <th>所属项目</th>
                         <th>快递编号</th>
+                        <th>管数</th>
                         <th>修改日期</th>
                         <th>样品备注</th>
                     </tr>
-                    {% for n1,n2,n3,n4,n5,n6 in sample_info %}
+                  </thead>
+                  <tbody>
+                    {% for n1,n2,n3,n4,n5,n6,n7 in sample_info %}
                         <tr>
                             <td>{{ n2 }}</td>
                             <td>{{ n3 }}</td>
-                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n4 }}</a></td>
+                            <td>{{ n4 }}</td>
                             <td>{{ n5 }}</td>
                             <td>{{ n6 }}</td>
+                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n7 }}</a></td>
                         </tr>
                     {% endfor  %}
+                  </tbody>
                 </table>
             </div>
             <!-- /.box-body -->
@@ -74,21 +82,17 @@
 {% block page_script %}
 <script src="{% static 'js/bootstrap-editable.js' %}"></script>
 <script>
-    $(document).ready(function(){
-        $(".tree >li").removeClass('active');
-        $("#receive_sample").addClass("active");
-    });
-
     function select_project(project_id) {
         window.location.href = '/lims_app/receive_sample?project_id=' + project_id;
     }
     $(function () {
+        $('#sample_table').DataTable();
         $('.username').editable({
-           url: '/lims_app/save_sample_info',
+           url: '/lims_app/save_sample_info?table=receive_sample',
            type: 'text',
            pk: 1,
            name: this.id,
-           title: '添加快递编号',
+           title: '添加备注',
         });
     });
 

@@ -13,75 +13,54 @@
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">OMPJ-001</h3>
+                <h3 class="box-title">{{ select_proj }}</h3>
 
                 <div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     选择项目 <span class="caret"></span>
                   </button>
-                  <ul class="dropdown-menu">
-                    <li><a href="#">OMPJ-001</a></li>
-                    <li><a href="#">OMPJ-002</a></li>
-                    <li><a href="#">OMPJ-003</a></li>
+                  <ul class="dropdown-menu" id="select_proj">
+                    {% for key,value in proj_info %}
+                        <li value="{{ key }}" onclick="select_project(this.value)"><a>{{ value }}</a></li>
+                    {% endfor %}
                     <li role="separator" class="divider"></li>
-                    <li><a href="#">我负责的所有项目</a></li>
+                    {# <li><a href="#">我负责的所有项目</a></li> #}
                   </ul>
                 </div>
-                <!-- upload button -->
-                <button type="submit" class="btn btn-default" class="fa" onclick="location.href='/lims_app/upload/?table=quality_check';")}">上传质检结果</button>
-                <div class="box-tools">
-                    <div class="input-group input-group-sm" style="width: 150px;">
-                        <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
-
-                        <div class="input-group-btn">
-                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
-                        </div>
-                    </div>
-                </div>
+                <!-- upload button
+                {#<button type="submit" class="btn btn-default" class="fa" onclick="location.href='/lims_app/upload/?table=quality_check';")}">上传质检结果</button>#}
+                -->
             </div>
-            <!-- /.box-header -->
-            <div class="box-body table-responsive no-padding">
-                <table class="table table-hover">
+            <div class="box-body">
+                <table class="table table-responsive no-padding" id="quality_check">
+                  <thead>
                     <tr>
                         <th>样品编号</th>
+                        <th>样品名称</th>
                         <th>所属项目</th>
-                        <th>快递编号</th>
+                        <th>RIN值</th>
+                        <th>浓度</th>
+                        <th>体积</th>
+                        <th>判定结果</th>
                         <th>修改日期</th>
-                        <!--<th>状态</th>-->
                         <th>样品备注</th>
                     </tr>
+                  </thead>
+                  <tbody>
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9,n10 in sample_info %}
                     <tr>
-                        <td>OMID-183</td>
-                        <td>OMPJ-001</td>
-                        <td>111122233445</td>
-                        <td>11-7-2014</td>
-                        <!--<td><span class="label label-success">Approved</span></td>-->
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
+                        <td>{{ n2 }}</td>
+                        <td>{{ n3 }}</td>
+                        <td>{{ n4 }}</td>
+                        <td>{{ n5 }}</td>
+                        <td>{{ n6 }}</td>
+                        <td>{{ n7 }}</td>
+                        <td>{{ n8 }}</td>
+                        <td>{{ n9 }}</td>
+                          <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n10 }}</a></td>
                     </tr>
-                    <tr>
-                        <td>OMID-219</td>
-                        <td>OMPJ-001</td>
-                        <td>111122233446</td>
-                        <td>11-7-2014</td>
-                        <!--<td><span class="label label-warning">Pending</span></td>-->
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                    </tr>
-                    <tr>
-                        <td>OMID-657</td>
-                        <td>OMPJ-001</td>
-                        <td>111122233447</td>
-                        <td>11-7-2014</td>
-                        <!--<td><span class="label label-primary">Approved</span></td>-->
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                    </tr>
-                    <tr>
-                        <td>OMID-175</td>
-                        <td>OMPJ-001</td>
-                        <td>111122233448</td>
-                        <td>11-7-2014</td>
-                        <!--<td><span class="label label-danger">Denied</span></td>-->
-                        <td>Bacon ipsum dolor sit amet salami venison chicken flank fatback doner.</td>
-                    </tr>
+                    {% endfor %}
+                  </tbody>
                 </table>
             </div>
             <!-- /.box-body -->
@@ -91,11 +70,28 @@
 </div>
 {% endblock %}
 
+{% load staticfiles %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-editable.css' %}">
+{% endblock %}
+
 {% block page_script %}
+<script src="{% static 'js/bootstrap-editable.js' %}"></script>
 <script>
-    $(document).ready(function(){
-        $(".tree >li").removeClass('active');
-        $("#receive_sample").addClass("active");
+    function select_project(project_id) {
+      window.location.href = '/lims_app/quality_check?project_id=' + project_id;
+    }
+
+    $(function(){
+        $('#quality_check').DataTable();
+        $('.username').editable({
+           url: '/lims_app/save_sample_info?table=quality_check',
+           type: 'text',
+           pk: 1,
+           name: this.id,
+           title: '添加备注',
+        });
     });
 </script>
 {% endblock %}
