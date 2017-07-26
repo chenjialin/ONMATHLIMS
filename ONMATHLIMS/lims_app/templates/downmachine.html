@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content_header %}
+<h1>样品下机</h1>
+<ol class="breadcrumb">
+    <li><a href="{% url 'main' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+    <li class="active">样品下机</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title" id="table_title">{{ select_proj }}</h3>
+
+                <div class="btn-group">
+                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    选择项目 <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" id="select_proj">
+                      {% for key,value in proj_info %}
+                          <li value="{{ key }}" onclick="select_project(this.value)"><a>{{ value }}</a></li>
+                      {% endfor %}
+                    <li role="separator" class="divider"></li>
+{#                    <li onclick="select_project('all')"><a>我负责的所有项目</a></li>#}
+                  </ul>
+                </div>
+                <!--
+                <div class="box-tools">
+                    <div class="input-group input-group-sm" style="width: 150px;">
+                        <input type="text" name="table_search" class="form-control pull-right" placeholder="Search">
+
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                        </div>
+                    </div>
+                </div>
+              -->
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <table class="table table-responsive no-padding" id="downmachine">
+                  <thead>
+                    <tr>
+                        <th>样品编号</th>
+                        <th>样品名称</th>
+                        <th>所属项目</th>
+                        <th>下机数据量</th>
+                        <th>q20</th>
+                        <th>q30</th>
+                        <th>修改日期</th>
+                        <th>样品备注</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9 in sample_info %}
+                        <tr>
+                            <td>{{ n2 }}</td>
+                            <td>{{ n3 }}</td>
+                            <td>{{ n4 }}</td>
+                            <td>{{ n5 }}</td>
+                            <td>{{ n6 }}</td>
+                            <td>{{ n7 }}</td>
+                            <td>{{ n8 }}</td>
+                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n9 }}</a></td>
+                        </tr>
+                    {% endfor  %}
+                  </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+{% endblock %}
+
+{% load staticfiles %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-editable.css' %}">
+{% endblock %}
+
+{% block page_script %}
+<script src="{% static 'js/bootstrap-editable.js' %}"></script>
+<script>
+    function select_project(project_id) {
+        window.location.href = '/lims_app/downmachine?project_id=' + project_id;
+    }
+    $(function () {
+        $('#downmachine').DataTable();
+        $('.username').editable({
+           url: '/lims_app/save_sample_info?table=downmachine',
+           type: 'text',
+           pk: 1,
+           name: this.id,
+           title: '添加备注',
+        });
+    });
+
+</script>
+{% endblock %}
