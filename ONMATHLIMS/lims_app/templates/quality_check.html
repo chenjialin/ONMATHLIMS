@@ -13,8 +13,7 @@
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title">{{ select_proj }}</h3>
-
+                <h3 class="box-title" id="selected_proj">{{ select_proj }}</h3>
                 <div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     选择项目 <span class="caret"></span>
@@ -24,20 +23,19 @@
                         <li value="{{ key }}" onclick="select_project(this.value)"><a>{{ value }}</a></li>
                     {% endfor %}
                     <li role="separator" class="divider"></li>
-                    {# <li><a href="#">我负责的所有项目</a></li> #}
                   </ul>
                 </div>
-                <!-- upload button
-                {#<button type="submit" class="btn btn-default" class="fa" onclick="location.href='/lims_app/upload/?table=quality_check';")}">上传质检结果</button>#}
-                -->
-            </div>
+                <!-- download button -->
+                <button type="submit" class="btn btn-default" title="下载项目" data-toggle="popover" data-placement="top" data-content="你还没有当前下载项目编号!" onclick="download_project()">
+                  下载质检结果
+                </button>
+                </div>
             <div class="box-body">
                 <table class="table table-responsive no-padding" id="quality_check_table">
                   <thead>
                     <tr>
                         <th>样品编号</th>
                         <th>样品名称</th>
-                        <th>所属项目</th>
                         <th>RIN值</th>
                         <th>浓度</th>
                         <th>体积</th>
@@ -47,7 +45,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9,n10 in sample_info %}
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9 in sample_info %}
                     <tr>
                         <td>{{ n2 }}</td>
                         <td>{{ n3 }}</td>
@@ -56,8 +54,7 @@
                         <td>{{ n6 }}</td>
                         <td>{{ n7 }}</td>
                         <td>{{ n8 }}</td>
-                        <td>{{ n9 }}</td>
-                        <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n10 }}</a></td>
+                        <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n9 }}</a></td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -82,7 +79,14 @@
     function select_project(project_id) {
       window.location.href = '/lims_app/quality_check?project_id=' + project_id;
     }
-
+    function download_project() {
+      if($("#selected_proj").html().split('-')[0] == 'ONMATH'){
+        project_number = $("#selected_proj").html();
+        window.location.href = '/lims_app/down_sample_info?table=quality_check&project_number=' + project_number;
+      }else{
+        $("[data-toggle='popover']").popover();
+      }
+    }
     $(function(){
         $('#quality_check_table').DataTable();
         $('.username').editable({
