@@ -13,7 +13,7 @@
     <div class="col-xs-12">
         <div class="box">
             <div class="box-header">
-                <h3 class="box-title" id="table_title">{{ select_proj }}</h3>
+                <h3 class="box-title" id="selected_proj">{{ select_proj }}</h3>
 
                 <div class="btn-group">
                   <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -26,6 +26,9 @@
                     <li role="separator" class="divider"></li>
                   </ul>
                 </div>
+                <button type="submit" class="btn btn-default" title="下载项目" data-toggle="popover" data-placement="top" data-content="你还没有当前下载项目编号!" onclick="download_project()">
+                  下载建库结果
+                </button>
                 <!--
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
@@ -40,26 +43,24 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-                <table class="table table-responsive no-padding" id="build_lib">
+                <table class="table table-responsive no-padding" id="build_lib_table">
                   <thead>
                     <tr>
                         <th>样品编号</th>
                         <th>样品名称</th>
-                        <th>所属项目</th>
                         <th>文库编号</th>
                         <th>修改日期</th>
                         <th>样品备注</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for n1,n2,n3,n4,n5,n6,n7 in sample_info %}
+                    {% for n1,n2,n3,n4,n5,n6 in sample_info %}
                         <tr>
                             <td>{{ n2 }}</td>
                             <td>{{ n3 }}</td>
                             <td>{{ n4 }}</td>
                             <td>{{ n5 }}</td>
-                            <td>{{ n6 }}</td>
-                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n7 }}</a></td>
+                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n6 }}</a></td>
                         </tr>
                     {% endfor  %}
                   </tbody>
@@ -84,8 +85,16 @@
     function select_project(project_id) {
         window.location.href = '/lims_app/build_lib?project_id=' + project_id;
     }
+    function download_project() {
+      if($("#selected_proj").html().split('-')[0] == 'ONMATH'){
+        project_number = $("#selected_proj").html();
+        window.location.href = '/lims_app/down_sample_info?table=build_lib&project_number=' + project_number;
+      }else{
+        $("[data-toggle='popover']").popover();
+      }
+    }
     $(function () {
-        $('#build_lib').DataTable();
+        $('#build_lib_table').DataTable();
         $('.username').editable({
            url: '/lims_app/save_sample_info?table=build_lib',
            type: 'text',

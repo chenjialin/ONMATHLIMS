@@ -4,12 +4,13 @@ import os
 import sys
 import json
 
-from . import DbObjectDoesNotExist
+from . import DbObjectDoesNotExist, select_colums_dict
+import django_excel as excel
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from forms import SampleProjectMasterForm, UserForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
-from models import UserInfo, SampleProjectMaster, SampleInfoDetail
+from models import SampleProjectMaster, SampleInfoDetail
 from interface import search_result_ini, get_sample_info
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -131,31 +132,6 @@ def project_view(request):
 view function for onmathlims modules
 '''
 
-'''
-def generate_view(view):
-    def func(request, view):
-        username = request.COOKIES.get('username', '')
-        if not username:
-            response = HttpResponseRedirect('/lims_app/login/')
-            return response
-
-        if 'search' in request.GET.keys() or 'q' in request.GET.keys():
-            key_word = request.GET.get('q')
-            response = HttpResponseRedirect('lims_app/search?q=%s' %key_word)
-            return response
-
-        project_id = request.GET.get('project_id', '') or 0
-        all_proj_info = get_sample_info.get_all_proj_info()
-        sample_info = get_sample_info.get_sample_by_project(project_id, name=view)
-        select_proj = get_sample_info.get_proj_name_by_id(project_id)
-
-        return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', view + '.html'),
-                      {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                       'select_proj': select_proj})
-    return func
-'''
-
-
 def receive_sample(request):
     username = request.COOKIES.get('username', '')
     if not username:
@@ -261,3 +237,22 @@ def save_sample_info(request):
         SampleInfoDetail.objects.filter(id=sample_id.replace('sample_id_', '')).update(downmachine_comment=value)
 
     return JsonResponse({'msg': 'ok'})
+
+
+def down_sample_info(request):
+    transform_title = {'quality_check': u'质检', 'receive_sample': u'送样', 'build_lib': u'建库',
+                        'upmachine': u'上机', 'downmachine': u'下机'}
+
+    table_name = request.GET.get('table', '')
+    project_number = request.GET.get('project_number', '')
+    if table_name and project_number:
+        query_sets = SampleInfoDetail.objects.filter(project_number=project_number)
+        column_names = select_colums_dict[table_name]
+        return excel.make_response_from_query_sets(    #require excel module
+            query_sets,
+            column_names,
+            'xls',
+            file_name=project_number + transform_title[table_name] + u'结果'
+        )
+    else:
+        JsonResponse({'msg': 'error'})
