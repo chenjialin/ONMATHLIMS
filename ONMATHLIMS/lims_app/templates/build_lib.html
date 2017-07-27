@@ -40,7 +40,7 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-                <table class="table table-responsive no-padding" id="build_lib">
+                <table class="table table-responsive no-padding" id="build_lib_table">
                   <thead>
                     <tr>
                         <th>样品编号</th>
@@ -85,7 +85,7 @@
         window.location.href = '/lims_app/build_lib?project_id=' + project_id;
     }
     $(function () {
-        $('#build_lib').DataTable();
+        $('#build_lib_table').DataTable();
         $('.username').editable({
            url: '/lims_app/save_sample_info?table=build_lib',
            type: 'text',
