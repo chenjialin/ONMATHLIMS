@@ -149,7 +149,7 @@ def receive_sample(request):
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                   'select_proj': select_proj})
+                   'select_proj': select_proj, 'project_id': project_id})
 
 
 def quality_check(request):
@@ -256,3 +256,21 @@ def down_sample_info(request):
         )
     else:
         JsonResponse({'msg': 'error'})
+
+
+def save_table_data(request):
+    json_data = request.POST['json_data']
+    project_id = request.POST['project_id']
+    json_data = json.loads(json_data)
+    # delete old data, 这里不应该做物理删除， 应该用一个字段来代表 记录被删除， 当显示的时候， 我们对其进行过滤就行了， 请设计相应字段(ง •̀_•́)ง
+    SampleInfoDetail.objects.filter(project_id=project_id).delete()
+
+    # insert new data
+    for row_dict in json_data:
+        SampleInfoDetail.objects.create(sample_name=row_dict['样品名称'],
+                                        express_number=row_dict['样品名称'],
+                                        product_num=row_dict['管数'],
+                                        sendsample_time=row_dict['修改日期'],
+                                        sendsample_comment=row_dict['样品备注'])
+
+    return redirect('/lims_app/receive_sample/?project_id=%s' % project_id)

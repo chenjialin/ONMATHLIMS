@@ -29,6 +29,7 @@
                 <button type="submit" class="btn btn-default" title="下载项目" data-toggle="popover" data-placement="top" data-content="你还没有当前下载项目编号!" onclick="download_project()">
                   下载送样结果
                 </button>
+                <input type="file" accept=" application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="upload_excel"/>
                 <!--
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
@@ -81,7 +82,10 @@
 
 {% block page_script %}
 <script src="{% static 'js/bootstrap-editable.js' %}"></script>
+<script src="{% static 'js/xlsx.core.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
 <script>
+    var project_id = "{{ project_id }}";
     function select_project(project_id) {
         window.location.href = '/lims_app/receive_sample?project_id=' + project_id;
     }
@@ -102,6 +106,35 @@
            name: this.id,
            title: '添加备注',
         });
+    });
+
+    $('#upload_excel').bind('change', function (e) {
+        if (project_id == 0) {
+            alert("请选择项目后再上传文件！");
+            return;
+        }
+        var excel_json_data;
+        var files = e.target.files;
+        var i,f;
+        for (i = 0, f = files[i]; i != files.length; ++i) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var data = e.target.result;
+                var workbook = XLSX.read(data, {type: 'binary'});
+                var sheet_name_list = workbook.SheetNames;
+                sheet_name_list.forEach(function(y) {
+                excel_json_data = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+                //todo 这里检查json数据是否符合规范， title是否对上， 如果 不符合规范， alert 相应信息
+                var status = confirm("是否覆盖表格数据？");
+                if(status) {
+                        ajaxSend('/lims_app/save_table_data/', {'json_data': JSON.stringify(excel_json_data),
+                            'project_id': project_id}, function(){}, 'POST')
+                    }
+                });
+            };
+            reader.readAsBinaryString(f);
+        }
+        $('#upload_excel').val('');
     });
 
 </script>
