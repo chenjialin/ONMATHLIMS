@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import sys
 import json
+import datetime
 
 from . import DbObjectDoesNotExist, select_colums_dict
 import django_excel as excel
@@ -10,14 +11,29 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from forms import SampleProjectMasterForm, UserForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
-from models import SampleProjectMaster, SampleInfoDetail
-from interface import search_result_ini, get_sample_info
+from models import SampleProjectMaster, SampleInfoDetail, Attachment
+from interface import search_result_ini, get_sample_info, common
+
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 
 # Create your views here.
 CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def login_required(func):
+    """
+    Check if already login
+    """
+    def _decorator(request, *args, **kwargs):
+        username = request.COOKIES.get('username', '')
+        if username:
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect('/lims_app/login/')
+    return _decorator
 
 
 def login(request):
@@ -40,12 +56,8 @@ def logout(request):
     return response
 
 
+@login_required
 def project_input(request):
-    username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
     if request.method == "POST":
         form = SampleProjectMasterForm(request.POST)
         if form.is_valid():
@@ -132,6 +144,7 @@ def project_view(request):
 view function for onmathlims modules
 '''
 
+
 def receive_sample(request):
     username = request.COOKIES.get('username', '')
     if not username:
@@ -144,12 +157,22 @@ def receive_sample(request):
 
     project_id = request.GET.get('project_id', '') or 0
     all_proj_info = get_sample_info.get_all_proj_info()
+    all_attachment = common.get_attachment(project_id, 'receive_sample')
     sample_info = get_sample_info.get_sample_by_project(project_id, name='receive_sample')
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                   'select_proj': select_proj, 'project_id': project_id})
+                   'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
+
+
+def operation_log(request):
+    username = request.COOKIES.get('username', '')
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'operation_log.html'))
 
 
 def quality_check(request):
@@ -217,11 +240,8 @@ def downmachine(request):
                      'select_proj': select_proj})
 
 
+@login_required
 def save_sample_info(request):
-    username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
     table_name = request.GET.get('table')
     sample_id = request.POST['name']
     value = request.POST['value']
@@ -274,3 +294,40 @@ def save_table_data(request):
                                         sendsample_comment=row_dict['样品备注'])
 
     return redirect('/lims_app/receive_sample/?project_id=%s' % project_id)
+
+
+def upload_attachment(request):
+    username = request.COOKIES.get('username', '')
+    file_name = request.GET.get("file_name")
+    file_type = request.GET.get("type")
+    project_id = request.GET.get("project_id")
+    user_id = get_sample_info.get_user_id_by_name(username)
+    content = request.FILES['file']
+    file_path = 'lims_app' + os.path.sep + 'static' + os.path.sep + 'attachment' + os.path.sep + str(project_id)\
+                + os.path.sep + file_type
+    full_file_name = file_path + os.path.sep + file_name
+    if not os.path.exists(file_path):
+        os.system('mkdir -p %s' % file_path)
+    of = open(full_file_name, 'wb+')
+    for chunk in content.chunks():
+        of.write(chunk)
+    of.close()
+    Attachment(project_id=project_id, upload_user_id=user_id,
+               operate_user_id=user_id,
+               file_type=file_type,
+               filename=file_name,
+               file_path=full_file_name,
+               status='new',
+               upload_time=datetime.datetime.now()
+               ).save()
+
+    return HttpResponse(json.dumps({"ret": True}))
+
+
+def delete_attachment(request):
+    project_id = request.GET.get('project_id')
+    file_name = request.GET.get('file_name')
+    file_type = request.GET.get('file_type')
+    Attachment.objects.filter(project_id=project_id, filename=file_name, file_type=file_type).delete()
+
+    return HttpResponse(json.dumps({"ret": True}))

@@ -49,3 +49,12 @@ def get_sample_by_project(project_id, name='receive_sample'):
     result = cursor.fetchall()
 
     return result
+
+
+def get_user_id_by_name(username):
+    cmd = "select id from user_info where username='%s'" % username
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    result = cursor.fetchone()
+
+    return result[0] if result else 0

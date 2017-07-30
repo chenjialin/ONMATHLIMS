@@ -240,3 +240,20 @@ class UserInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'user_info'
+
+
+class Attachment(models.Model):
+    # id = models.AutoField(primary_key=True)
+    # id = models.IntegerField(primary_key=True)
+    project_id = models.IntegerField()
+    upload_user_id = models.IntegerField()
+    operate_user_id = models.IntegerField()
+    file_type = models.CharField(max_length=45, blank=True, null=True)
+    filename = models.CharField(max_length=200, blank=True, null=True)
+    file_path = models.CharField(max_length=200, blank=True, null=True)
+    status = models.CharField(max_length=45, blank=True, null=True)
+    upload_time = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'attachment'
