@@ -46,21 +46,21 @@
                 <table class="table table-responsive no-padding" id="build_lib_table">
                   <thead>
                     <tr>
-                        <th>样品编号</th>
                         <th>样品名称</th>
+                        <th>样品编号</th>
                         <th>文库编号</th>
                         <th>修改日期</th>
                         <th>样品备注</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for n1,n2,n3,n4,n5,n6 in sample_info %}
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8 in sample_info %}
                         <tr>
-                            <td>{{ n2 }}</td>
-                            <td>{{ n3 }}</td>
                             <td>{{ n4 }}</td>
                             <td>{{ n5 }}</td>
-                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n6 }}</a></td>
+                            <td>{{ n6 }}</td>
+                            <td>{{ n7 }}</td>
+                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n8 }}</a></td>
                         </tr>
                     {% endfor  %}
                   </tbody>

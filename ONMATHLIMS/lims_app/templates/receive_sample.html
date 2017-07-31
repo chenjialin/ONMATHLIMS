@@ -37,6 +37,7 @@
                   <thead>
                     <tr>
                         <th>样品名称</th>
+                        <th>物种</th>
                         <th>快递编号</th>
                         <th>管数</th>
                         <th>修改日期</th>
@@ -44,13 +45,14 @@
                     </tr>
                   </thead>
                   <tbody>
-                    {% for n1,n2,n3,n4,n5,n6 in sample_info %}
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9 in sample_info %}
                         <tr>
-                            <td>{{ n2 }}</td>
-                            <td>{{ n3 }}</td>
                             <td>{{ n4 }}</td>
                             <td>{{ n5 }}</td>
-                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n6 }}</a></td>
+                            <td>{{ n6 }}</td>
+                            <td>{{ n7 }}</td>
+                            <td>{{ n8 }}</td>
+                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n9 }}</a></td>
                         </tr>
                     {% endfor  %}
                   </tbody>
