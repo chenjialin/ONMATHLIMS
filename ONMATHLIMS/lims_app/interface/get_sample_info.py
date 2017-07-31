@@ -1,9 +1,8 @@
 # coding: utf8
 from django.db import connection
 
-cmd_dict = {'receive_sample': """select d.id, d.sample_name,
-          d.express_number, d.product_num, d.sendsample_time, d.sendsample_comment
-          from sample_info_detail d inner join sample_project_master m on m.id=d.project_id""",
+cmd_dict = {'receive_sample': """select *
+          from send_sample ss inner join sample_project_master m on m.id=ss.project_id""",
             'quality_check': """select d.id, d.sample_id, d.sample_name,
           d.rin, d.concentration, d.volume, d.qualitycheck_results, qualitycheck_time, qualitycheck_comment
           from sample_info_detail d inner join sample_project_master m on m.id=d.project_id""",
@@ -36,13 +35,13 @@ def get_all_proj_info():
     return result
 
 
-def get_sample_by_project(project_id, name='receive_sample'):
+def get_sample_by_project(project_id, name):
     """
     :param project_id:
     :return:
     where project_id='%s'
     """
-    cmd = cmd_dict[name] + " where project_id=%s" % project_id
+    cmd = "select * from %s where project_id='%s'" % (name, project_id)
 
     cursor = connection.cursor()
     cursor.execute(cmd)

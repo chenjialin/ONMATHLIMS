@@ -26,7 +26,7 @@ CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def login_required(func):
     """
-    Check if already login
+    Check if already login and search record
     """
     def _decorator(request, *args, **kwargs):
         username = request.COOKIES.get('username', '')
@@ -34,7 +34,26 @@ def login_required(func):
             return func(request, *args, **kwargs)
         else:
             return HttpResponseRedirect('/lims_app/login/')
+
     return _decorator
+
+
+def view_todo(request, username, table=None, modules=True):
+    if not username:
+        response = HttpResponseRedirect('/lims_app/login/')
+        return response
+
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+
+    if modules:
+        project_id = request.GET.get('project_id', '') or 0
+        all_proj_info = get_sample_info.get_all_proj_info()
+        sample_info = get_sample_info.get_sample_by_project(project_id, name=table)
+        select_proj = get_sample_info.get_proj_name_by_id(project_id)
+        all_attachment = common.get_attachment(project_id, table)
+        return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
 
 
 def login(request):
@@ -57,19 +76,6 @@ def logout(request):
     return response
 
 
-@login_required
-def project_input(request):
-    if request.method == "POST":
-        form = SampleProjectMasterForm(request.POST)
-        if form.is_valid():
-            project = form.save()
-            project.save()
-            return HttpResponseRedirect(reverse("welcome"))
-    else:
-        form = SampleProjectMasterForm()
-    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'project_input.html'), {'form': form})
-
-
 def search(request):
     username = request.COOKIES.get('username', '')
     if not username:
@@ -83,90 +89,6 @@ def search(request):
                    'table_values': table_values, 'count': len(table_values)})
 
 
-def main(request):
-    username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
-        # search on main page
-        key_word = request.GET.get('q')
-        return redirect('/lims_app/search?q=%s' % key_word)
-    else:
-        all_projects = SampleProjectMaster.objects.all()
-        all_projects_list = []
-        for each_project in all_projects:
-            project_dict = {}
-            project_dict['id'] = each_project.id
-            project_dict['project_number'] = each_project.project_number
-            project_dict['create_time'] = each_project.create_time.split(" ")[0]
-            project_dict['status'] = each_project.status
-            project_dict['cust_user'] = each_project.cust_user
-            all_projects_list.append(project_dict)
-        return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
-                      {'username': username, 'all_projects': all_projects_list})
-
-
-'''
-def project_view(request):
-    username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    msg = 'request is not post!'
-    if request.method == 'POST':
-        project_master_info = {}
-        for key, value in request.POST.items():
-            project_master_info[key] = value
-
-        if project_master_info['action'] == 'edit':
-            new_project_master_info = SampleProjectMaster(id=project_master_info['id'],
-                                                          project_number=project_master_info[u'项目编号'],
-                                                          cust_user=project_master_info[u'客户名称'],
-                                                          status=project_master_info[u'状态'],
-                                                          create_time=project_master_info[u'创建时间'])
-            new_project_master_info.save()
-            msg = 'update success!'
-        elif project_master_info['action'] == 'delete':
-            try:
-                old_project_master_info = SampleProjectMaster.objects.get(id=project_master_info['id'])
-                old_project_master_info.delete()
-            except DbObjectDoesNotExist, e:
-                msg = 'nothing to delete!'
-            msg = 'delete success!'
-        else:
-            msg = 'do nothing!'
-    return HttpResponse({json.dumps(msg)})
-'''
-
-'''
-view function for onmathlims modules
-'''
-
-
-def receive_sample(request):
-    username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
-        key_word = request.GET.get('q')
-        return redirect('/lims_app/search?q=%s' % key_word)
-
-    project_id = request.GET.get('project_id', '') or 0
-    all_proj_info = get_sample_info.get_all_proj_info()
-    all_attachment = common.get_attachment(project_id, 'receive_sample')
-    sample_info = get_sample_info.get_sample_by_project(project_id, name='receive_sample')
-    select_proj = get_sample_info.get_proj_name_by_id(project_id)
-
-    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
-                  {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                   'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
-
-
 def operation_log(request):
     username = request.COOKIES.get('username', '')
     if not username:
@@ -176,17 +98,53 @@ def operation_log(request):
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'operation_log.html'))
 
 
+def main(request):
+    username = request.COOKIES.get('username', '')
+    view_todo(request, username, modules=False)
+    all_projects = SampleProjectMaster.objects.all()
+    all_projects_list = []
+    for each_project in all_projects:
+        project_dict = {}
+        project_dict['id'] = each_project.id
+        project_dict['project_number'] = each_project.project_number
+        project_dict['create_time'] = each_project.create_time.split(" ")[0]
+        project_dict['status'] = each_project.status
+        project_dict['cust_user'] = each_project.cust_user
+        all_projects_list.append(project_dict)
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
+                      {'username': username, 'all_projects': all_projects_list})
+
+
+@login_required
+def project_input(request):
+    if request.method == "POST":
+        form = SampleProjectMasterForm(request.POST)
+        if form.is_valid():
+            project = form.save()
+            project.save()
+            return HttpResponseRedirect(reverse("welcome"))
+    else:
+        form = SampleProjectMasterForm()
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'project_input.html'), {'form': form})
+
+
+'''
+view function for onmathlims modules
+'''
+
+
+def receive_sample(request):
+    username = request.COOKIES.get('username', '')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='send_sample')
+
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
+                  {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
+                   'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
+
+
 def quality_check(request):
     username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    project_id = request.GET.get('project_id', '') or 0
-    all_proj_info = get_sample_info.get_all_proj_info()
-    sample_info = get_sample_info.get_sample_by_project(project_id, name='quality_check')
-    select_proj = get_sample_info.get_proj_name_by_id(project_id)
-    all_attachment = common.get_attachment(project_id, 'quality_check')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='quality_check')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
@@ -195,15 +153,7 @@ def quality_check(request):
 
 def build_lib(request):
     username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    project_id = request.GET.get('project_id', '') or 0
-    all_proj_info = get_sample_info.get_all_proj_info()
-    sample_info = get_sample_info.get_sample_by_project(project_id, name='build_lib')
-    select_proj = get_sample_info.get_proj_name_by_id(project_id)
-    all_attachment = common.get_attachment(project_id, 'build_lib')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='build_lib')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'build_lib.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
@@ -212,15 +162,7 @@ def build_lib(request):
 
 def upmachine(request):
     username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    project_id = request.GET.get('project_id', '') or 0
-    all_proj_info = get_sample_info.get_all_proj_info()
-    sample_info = get_sample_info.get_sample_by_project(project_id, name='upmachine')
-    select_proj = get_sample_info.get_proj_name_by_id(project_id)
-    all_attachment = common.get_attachment(project_id, 'upmachine')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='upmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
@@ -229,15 +171,7 @@ def upmachine(request):
 
 def downmachine(request):
     username = request.COOKIES.get('username', '')
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    project_id = request.GET.get('project_id', '') or 0
-    all_proj_info = get_sample_info.get_all_proj_info()
-    sample_info = get_sample_info.get_sample_by_project(project_id, name='downmachine')
-    select_proj = get_sample_info.get_proj_name_by_id(project_id)
-    all_attachment = common.get_attachment(project_id, 'downmachine')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='downmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'downmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
