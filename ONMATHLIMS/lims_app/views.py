@@ -6,6 +6,7 @@ import json
 import datetime
 
 from . import DbObjectDoesNotExist, select_colums_dict
+sys.path.append('/usr/local/lib/python2.7/dist-packages')
 import django_excel as excel
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from forms import SampleProjectMasterForm, UserForm
@@ -298,7 +299,7 @@ def save_table_data(request):
 
 def upload_attachment(request):
     username = request.COOKIES.get('username', '')
-    file_name = request.GET.get("file_name")
+    file_name = request.GET.get("file_name").rsplit('\\')[-1]
     file_type = request.GET.get("type")
     project_id = request.GET.get("project_id")
     user_id = get_sample_info.get_user_id_by_name(username)
