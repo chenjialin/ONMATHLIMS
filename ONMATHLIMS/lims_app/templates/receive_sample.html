@@ -171,7 +171,7 @@
             obj.parentNode.parentNode.remove();
         })
     }
-    
+
     function uploadFile() {
         if (project_id == 0) {
             alert("请选择项目后再上传附件！");
@@ -189,6 +189,7 @@
             success : function(data) //
             {
                 $('#upload_attachment').val('');
+                window.location.href = "/lims_app/receive_sample/?project_id=" + project_id;
                 $("#project_files").append("<tr>" +
                     "<td><a href='/lims_app/static/attachment/"+ project_id +"/receive_sample/" +
                     file_name + "'>" + file_name + "</a></td>" +
