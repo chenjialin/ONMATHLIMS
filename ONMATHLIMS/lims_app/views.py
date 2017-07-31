@@ -186,10 +186,11 @@ def quality_check(request):
     all_proj_info = get_sample_info.get_all_proj_info()
     sample_info = get_sample_info.get_sample_by_project(project_id, name='quality_check')
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
+    all_attachment = common.get_attachment(project_id, 'quality_check')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                   'select_proj': select_proj})
+                   'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
 def build_lib(request):
@@ -202,10 +203,11 @@ def build_lib(request):
     all_proj_info = get_sample_info.get_all_proj_info()
     sample_info = get_sample_info.get_sample_by_project(project_id, name='build_lib')
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
+    all_attachment = common.get_attachment(project_id, 'build_lib')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'build_lib.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                     'select_proj': select_proj})
+                     'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
 def upmachine(request):
@@ -214,15 +216,15 @@ def upmachine(request):
         response = HttpResponseRedirect('/lims_app/login/')
         return response
 
-
     project_id = request.GET.get('project_id', '') or 0
     all_proj_info = get_sample_info.get_all_proj_info()
     sample_info = get_sample_info.get_sample_by_project(project_id, name='upmachine')
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
+    all_attachment = common.get_attachment(project_id, 'upmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                     'select_proj': select_proj})
+                     'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
 def downmachine(request):
@@ -235,10 +237,11 @@ def downmachine(request):
     all_proj_info = get_sample_info.get_all_proj_info()
     sample_info = get_sample_info.get_sample_by_project(project_id, name='downmachine')
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
+    all_attachment = common.get_attachment(project_id, 'downmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'downmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                     'select_proj': select_proj})
+                     'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
 @login_required
