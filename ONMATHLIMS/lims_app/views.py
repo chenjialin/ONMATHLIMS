@@ -38,22 +38,13 @@ def login_required(func):
     return _decorator
 
 
-def view_todo(request, username, table=None, modules=True):
-    if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
-        return response
-
-    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
-        key_word = request.GET.get('q')
-        return redirect('/lims_app/search?q=%s' % key_word)
-
-    if modules:
-        project_id = request.GET.get('project_id', '') or 0
-        all_proj_info = get_sample_info.get_all_proj_info()
-        sample_info = get_sample_info.get_sample_by_project(project_id, name=table)
-        select_proj = get_sample_info.get_proj_name_by_id(project_id)
-        all_attachment = common.get_attachment(project_id, table)
-        return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
+def view_todo(request, table=None):
+    project_id = request.GET.get('project_id', '') or 0
+    all_proj_info = get_sample_info.get_all_proj_info()
+    sample_info = get_sample_info.get_sample_by_project(project_id, name=table)
+    select_proj = get_sample_info.get_proj_name_by_id(project_id)
+    all_attachment = common.get_attachment(project_id, table)
+    return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
 
 
 def login(request):
@@ -98,9 +89,14 @@ def operation_log(request):
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'operation_log.html'))
 
 
+@login_required
 def main(request):
     username = request.COOKIES.get('username', '')
-    view_todo(request, username, modules=False)
+    #login_serach(request, username)
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+
     all_projects = SampleProjectMaster.objects.all()
     all_projects_list = []
     for each_project in all_projects:
@@ -133,45 +129,63 @@ view function for onmathlims modules
 '''
 
 
+@login_required
 def receive_sample(request):
     username = request.COOKIES.get('username', '')
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='send_sample')
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='send_sample')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
                    'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
+@login_required
 def quality_check(request):
     username = request.COOKIES.get('username', '')
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='quality_check')
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='quality_check')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
                    'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
+@login_required
 def build_lib(request):
     username = request.COOKIES.get('username', '')
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='build_lib')
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='build_lib')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'build_lib.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
                      'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
+@login_required
 def upmachine(request):
     username = request.COOKIES.get('username', '')
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='upmachine')
+    #login_serach(request, username)
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='upmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
                      'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
 
 
+@login_required
 def downmachine(request):
     username = request.COOKIES.get('username', '')
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, username, table='downmachine')
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='downmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'downmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
@@ -197,6 +211,7 @@ def save_sample_info(request):
     return JsonResponse({'msg': 'ok'})
 
 
+@login_required
 def down_sample_info(request):
     transform_title = {'quality_check': u'质检', 'receive_sample': u'送样', 'build_lib': u'建库',
                         'upmachine': u'上机', 'downmachine': u'下机'}
