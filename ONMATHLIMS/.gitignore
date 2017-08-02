@@ -18,3 +18,5 @@ build
 celerybeat-schedule
 supervisord_local.conf
 conf_local.ini
+# all upload files
+lims_app/static/attachment/*

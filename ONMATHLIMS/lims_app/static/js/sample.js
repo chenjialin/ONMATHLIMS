@@ -27,5 +27,5 @@ $(function(){
 	pageInit();
 });
 function pageInit(){
-	show_old_sample();
+	return;
 }

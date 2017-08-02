@@ -29,6 +29,9 @@
                 <button type="submit" class="btn btn-default" title="下载项目" data-toggle="popover" data-placement="top" data-content="你还没有当前下载项目编号!" onclick="download_project()">
                   下载建库结果
                 </button>
+                <button type="submit" class="btn btn-default" title="上传项目" data-toggle="popover" data-placement="top" data-content="你还没有当前上传项目编号!" onclick="upload_project()">
+                  上传建库结果
+                </button>
                 <!--
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
@@ -46,27 +49,58 @@
                 <table class="table table-responsive no-padding" id="build_lib_table">
                   <thead>
                     <tr>
-                        <th>样品编号</th>
                         <th>样品名称</th>
+                        <th>样品编号</th>
                         <th>文库编号</th>
                         <th>修改日期</th>
                         <th>样品备注</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for n1,n2,n3,n4,n5,n6 in sample_info %}
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8 in sample_info %}
                         <tr>
-                            <td>{{ n2 }}</td>
-                            <td>{{ n3 }}</td>
                             <td>{{ n4 }}</td>
                             <td>{{ n5 }}</td>
-                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n6 }}</a></td>
+                            <td>{{ n6 }}</td>
+                            <td>{{ n7 }}</td>
+                            <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n8 }}</a></td>
                         </tr>
                     {% endfor  %}
                   </tbody>
                 </table>
             </div>
             <!-- /.box-body -->
+            <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">上传项目附件</h3>
+                <input name="file" type="file" value="选择" size="20" id="upload_attachment" onchange ="uploadFile()">
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body no-padding">
+
+              <table class="table table-bordered table-condensed">
+                    <thead>
+                        <tr><th>文件名称</th><th>上传时间</th><th>用户名称</th><th>操作</th></tr>
+                    </thead>
+                    <tbody id="project_files">
+                        {% for n1,n2,n3 in all_attachment %}
+                            <tr>
+                                <td><a href='/lims_app/static/attachment/{{ project_id }}/build_lib/{{ n1 }}'>{{ n1 }}</a></td>
+                                <td>{{ n2 }}</td>
+                                <td>{{ n3 }}</td>
+                                <td><button onclick="delete_attachment(this, '{{ n1 }}')">删除</button></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
         </div>
         <!-- /.box -->
     </div>
@@ -77,11 +111,17 @@
 
 {% block page_css %}
     <link rel="stylesheet" href="{% static 'css/bootstrap-editable.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fileinput.css' %}">
 {% endblock %}
 
 {% block page_script %}
 <script src="{% static 'js/bootstrap-editable.js' %}"></script>
+<script src="{% static 'js/xlsx.core.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/ajaxfileupload.js' %}"></script>
 <script>
+    var project_id = "{{ project_id }}";
+    var username = "{{ username }}";
     function select_project(project_id) {
         window.location.href = '/lims_app/build_lib?project_id=' + project_id;
     }
@@ -89,6 +129,14 @@
       if($("#selected_proj").html().split('-')[0] == 'ONMATH'){
         project_number = $("#selected_proj").html();
         window.location.href = '/lims_app/down_sample_info?table=build_lib&project_number=' + project_number;
+      }else{
+        $("[data-toggle='popover']").popover();
+      }
+    }
+    function upload_project() {
+      if($("#selected_proj").html().split('-')[0] == 'ONMATH'){
+        project_number = $("#selected_proj").html();
+        window.location.href = '/lims_app/upload_sample_info?table=build_lib&project_id=' + project_id;
       }else{
         $("[data-toggle='popover']").popover();
       }
@@ -104,6 +152,42 @@
         });
         $("#build_lib").addClass('active');
     });
+    function delete_attachment(obj, file_name) {
+        ajaxSend('/lims_app/delete_attachment', {'file_name': file_name,
+            'project_id': project_id, 'file_type': 'build_lib'
+        }, function () {
+            obj.parentNode.parentNode.remove();
+        })
+    }
 
+    function uploadFile() {
+        if (project_id == 0) {
+            alert("请选择项目后再上传附件！");
+            return;
+        }
+        var file_name = $('#upload_attachment').val();
+        var url = "/lims_app/upload_attachment/?project_id=" +
+            project_id + "&type=build_lib&file_name=" +
+            file_name;
+        $.ajaxFileUpload({
+            url : url,
+            secureuri : false,
+            fileElementId : "upload_attachment",
+            dataType : 'json',
+            success : function(data) //
+            {
+                $('#upload_attachment').val('');
+                window.location.href = "/lims_app/build_lib/?project_id=" + project_id;
+                $("#project_files").append("<tr>" +
+                    "<td><a href='/lims_app/static/attachment/"+ project_id +"/build_lib/" +
+                    file_name + "'>" + file_name + "</a></td>" +
+                    "<td>"+ Date().toString() + "</td>" +
+                    "<td>"+ username + "</td>"  +
+                    "<td><button onclick='delete_attachment(this, \""+ file_name  +"\")'>删除</button></td>");
+            },
+            error : function(data){}
+        });
+        return false;
+    }
 </script>
 {% endblock %}

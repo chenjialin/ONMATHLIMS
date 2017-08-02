@@ -6,11 +6,6 @@
 {% load staticfiles %}
 <link rel="stylesheet" href="{% static "css/ui.jqgrid.css" %}" />
 <link rel="stylesheet" href="{% static "css/jquery-ui-1.8.16.custom.css" %}" />
-<script type="text/javascript" src="{% static "js/jquery-2.0.0.min.js" %}"></script>
-<script type="text/javascript" src="{% static "js/jquery.jqGrid.src.js"%}"></script>
-<script type="text/javascript" src="{% static "js/grid.locale-cn.js" %}"></script>
-<script type="text/javascript" src="{% static "js/sample.js" %}"></script>
-<script type="text/javascript" src="{% static "js/xlsx.core.min.js" %}"></script>
 <!--<script src="{% static "js/main.js" %}"></script> -->
 {% endblock %}
 
@@ -28,20 +23,22 @@
         <div class="box">
             <div class="box-header">
                 <div class="btn-group">
-                  <button type="submit" class="btn btn-default fa add">增加行</button>
-                  <button type="submit" class="btn btn-default fa edit">编辑行</button>
-                  <button type="submit" class="btn btn-default fa del">删除行</button>
-                  <button type="submit" class="btn btn-default fa save">保存表格</button>
+                  <button type="submit" class="btn btn-default add">增加行</button>
+                  <button type="submit" class="btn btn-default edit">编辑行</button>
+                  <button type="submit" class="btn btn-default del">删除行</button>
+                  <button type="submit" class="btn btn-default save">保存表格</button>
                 </div>
                 <span class="help-block"><b>样品详细信息：（请填写下表，如果您的样品数量较多建议您填写电子版表格后直接上传）</b>
                   {% if table == 'quality_check' %}
-                      <a href="static/download/quality_check.xlsx" style="font-size: smaller ">点击下载模板</a>
+                      <a href="{% static "download/quality_check.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% elif table == 'build_lib' %}
-                      <a href="static/download/build_lib.xlsx" style="font-size: smaller ">点击下载模板</a>
+                      <a href="{% static "download/build_lib.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% elif table == 'upmachine' %}
-                      <a href="static/download/upmachine.xlsx" style="font-size: smaller ">点击下载模板</a>
+                      <a href="{% static "download/upmachine.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% elif table == 'downmachine' %}
-                      <a href="static/download/downmachine.xlsx" style="font-size: smaller ">点击下载模板</a>
+                      <a href="{% static "download/downmachine.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
+                  {% elif table == 'send_sample' %}
+                      <a href="{% static "download/send_sample.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% endif %}
                   <input type="file" accept=" application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="upload_excel" />
                 </span>
@@ -58,7 +55,8 @@
             <!-- /.box-header -->
             <div class="box-body table-responsive no-padding">
               <table id="table" class="table table-hover"></table>
-              <button id="submit">提交样品表</button>
+              <button type="submit" class="btn btn-default" id="insert">导入数据</button>
+              <button type="submit" class="btn btn-default" id="update">更新数据</button>
             </div>
             <!-- /.box-body -->
         </div>
@@ -68,6 +66,21 @@
 {% endblock %}
   <!-- <input type="button" class="del" value="删除行"/> -->
   {% block page_script %}
+  <script type="text/javascript" src="{% static "js/jquery.jqGrid.src.js"%}"></script>
+  <script type="text/javascript" src="{% static "js/grid.locale-cn.js" %}"></script>
+  <script type="text/javascript" src="{% static "js/xlsx.core.min.js" %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% if table == 'quality_check' %}
+    <script src="{% static 'js/quality_check.js' %}"></script>
+  {% elif table == 'build_lib' %}
+    <script src="{% static 'js/build_lib.js' %}"></script>
+  {% elif table == 'upmachine' %}
+    <script src="{% static 'js/upmachine.js' %}"></script>
+  {% elif table == 'downmachine' %}
+    <script src="{% static 'js/downmachine.js' %}"></script>
+  {% elif table == 'send_sample' %}
+    <script src="{% static 'js/send_sample.js' %}"></script>
+  {% endif %}
   <script>
   /*
       $(document).ready(function(){
@@ -75,43 +88,34 @@
           $("#receive_sample").addClass("active");
       });
   */
-  //var project_id = {{ project_id }};
-  var table_map = {
-    '样品名称':'sample_name',
-    '物种':'sepcies',
-    '管数':'product_num',
-    '建库类型':'library_type',
-    '浓度(ng/uL)':'concentration',
-    '体积(ul)':'volume',
-    '总量(ug)':'data_quantity',
-    '片段长度(bp)':'fragment_length',
-    'OD260/280':'od_260_or_280',
-    'OD260/230':'od_260_or_230',
-    '备注':'comment'
-  };
+  var project_id = {{ project_id }};
+  var table = "{{ table }}";
 
-  	$("#table").jqGrid(
-  		{
-  			url: 'save',
-  			datatype : 'local',
-  			height: 500,
-  			// height: 'auto',
-  			colNames: ['样品编号', '样品名称', 'rin值','浓度(ng/uL)','体积(ul)', '判定结果', '时间', '备注'],
-  			colModel: [
-  						{ name: 'sample_id', index: 'sample_id', editable: true, width: 60},
-  						{ name: 'sample_name', index: 'sample_name', editable: true, width: 60},
-  						{ name: 'rin', index: 'rin', editable: true, width: 60},
-  						{ name: 'concentration', index: 'concentration', editable: true, width: 60},
-  						{ name: 'volume', index: 'volume', editable: true, width: 60},
-  						{ name: 'qualitycheck_results', index: 'qualitycheck_results', editable: true, width: 60},
-  						{ name: 'qualitycheck_time', index: 'qualitycheck_time', editable: true, width: 60},
-  						{ name: 'qualitycheck_comment', index: 'qualitycheck_comment', editable: true, width: 60}
-  					],
-  			gridComplete: function() {},
-  			caption : "质检结果",//表格的标题名字
-  			width: 1000
-  		});
+  var table_map  =  {'样品编号':'sample_id',
+                     '样品名称':'sample_name',
+                     '项目编号':'project_number',
+                     '物种': 'species',
+                     '快递编号': 'express_number',
+                     '管数': 'product_num',
+                     '浓度': 'concentration',
+                     '体积': 'volume',
+                     'RIN值': 'rin',
+                     '判定结果': 'results',
+                     '文库编号': 'lib_id',
+                     '上机类型': 'upmachinetype',
+                     '下机模式': 'mode',
+                     '数据量': 'data_count',
+                     'q20': 'q20',
+                     'q30': 'q30',
+                     '时间': 'time',
+                     '备注': 'comment'}
 
+  function save_sample_table() {
+    var ids = $("#table").getDataIDs();
+    for (var i in ids) {
+      $("#table").saveRow(ids[i], '', '/lims_app/save_sample_row/');
+    }
+  }
   $('#upload_excel').bind('change', handleFile);
 
   $(".add").unbind().bind('click', function(){
@@ -119,7 +123,7 @@
     var ids= jq_obj.getDataIDs();
     var new_row_id = ids.length == 0 ? '1' : parseInt(ids[ids.length-1].replace(/[^0-9]/ig,""))+1;
     var id = jq_obj.jqGrid('getGridParam','selrow');
-    if (id) {jq_obj.saveRow( id, '', '/save_sample_row');}
+    if (id) {jq_obj.saveRow( id, '', '/lims_app/save_sample_row/');}
     jq_obj.addRowData(new_row_id, {});
     jq_obj.editRow(new_row_id);
     jq_obj.setSelection(new_row_id);
@@ -152,25 +156,31 @@
     save_sample_table();
   });
 
-  $("#submit").unbind().bind('click', function () {
+  $("#insert").unbind().bind('click', function () {
     save_sample_table();
-    var status = confirm("确认提交样品表信息?");
+    var status = confirm("确认导入数据?");
     if (status) {
       var sample_table_data = $("#table").getRowData();
-      var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id};
-      ajaxSend('/save_sample_table', params, function (data) {
-        if (data.errcode !=0) {
-                    alert('保存失败!');
-                }
-                else {
-                    alert(data.msg);
-                    window.location.href='/';
-                }
-      }, 'POST');
-    }
+      var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id, 'action': 'insert', 'table': table}
+      ajaxSend('/lims_app/save_sample_table/', params , function (data) {
+          alert(data.msg);
+          window.location.href="/lims_app/upload_sample_info?table={{table}}&project_id={{project_id}}";
+        }, 'POST');
+      }
+    });
 
-
-  });
+    $("#update").unbind().bind('click', function () {
+      save_sample_table();
+      var status = confirm("确认更新数据?");
+      if (status) {
+        var sample_table_data = $("#table").getRowData();
+        var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id, 'action': 'update', 'table': table}
+        ajaxSend('/lims_app/save_sample_table/', params , function (data) {
+            alert(data.msg);
+            window.location.href="/lims_app/upload_sample_info?table={{table}}&project_id={{project_id}}";
+          }, 'POST');
+        }
+      });
 
   function handleFile(e) {
         var files = e.target.files;
@@ -216,28 +226,5 @@
         }
         $('#upload_excel').val('');
     }
-
-  function save_sample_table() {
-    var ids = $("#table").getDataIDs();
-    for (var i in ids) {
-      $("#table").saveRow(ids[i], '', 'save_row');
-    }
-  }
-
-  function show_old_sample() {
-    ajaxSend('get_sample_table_data', {'project_id': project_id}, function(data) {
-      if (data.errcode !=0) {
-        alert(data.msg);
-      }
-      else {
-        var ret_data = data.data;
-        var table_obj = $("#table");
-        for (var i in ret_data) {
-          i = parseInt(i);
-          table_obj.addRowData(i+1, ret_data[i]);
-        }
-      }
-    });
-  }
   </script>
   {% endblock %}
