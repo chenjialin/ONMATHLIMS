@@ -30,6 +30,9 @@
                 <button type="submit" class="btn btn-default" title="下载项目" data-toggle="popover" data-placement="top" data-content="你还没有当前下载项目编号!" onclick="download_project()">
                   下载上机结果
                 </button>
+                <button type="submit" class="btn btn-default" title="上传项目" data-toggle="popover" data-placement="top" data-content="你还没有当前上传项目编号!" onclick="upload_project()">
+                  上传上机结果
+                </button>
                 <!--
                 <div class="box-tools">
                     <div class="input-group input-group-sm" style="width: 150px;">
@@ -132,6 +135,14 @@
       if($("#selected_proj").html().split('-')[0] == 'ONMATH'){
         project_number = $("#selected_proj").html();
         window.location.href = '/lims_app/down_sample_info?table=upmachine&project_number=' + project_number;
+      }else{
+        $("[data-toggle='popover']").popover();
+      }
+    }
+    function upload_project() {
+      if($("#selected_proj").html().split('-')[0] == 'ONMATH'){
+        project_number = $("#selected_proj").html();
+        window.location.href = '/lims_app/upload_sample_info?table=upmachine&project_id=' + project_id;
       }else{
         $("[data-toggle='popover']").popover();
       }
