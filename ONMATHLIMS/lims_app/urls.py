@@ -3,7 +3,7 @@ from . import views
 urlpatterns = [
     url(r'project_input/', views.project_input),
     url(r'main/', views.main, name='main'),
-    url(r'receive_sample/', views.receive_sample, name='receive_sample'),
+    url(r'send_sample/', views.send_sample, name='send_sample'),
     url(r'^$', views.login, name='login'),
     url(r'^login/', views.login, name='login'),
     url(r'^logout/', views.logout, name='logout'),
@@ -15,6 +15,9 @@ urlpatterns = [
     url(r'^build_lib/', views.build_lib, name='build_lib'),
     url(r'^upmachine/', views.upmachine, name='upmachine'),
     url(r'^downmachine/', views.downmachine, name='downmachine'),
+    url(r'^upload_sample_info/', views.upload_sample_info, name='upload_sample_info'),
+    url(r'^save_sample_row/', views.save_sample_row, name='save_sample_row'),
+    url(r'^save_sample_table/', views.save_sample_table, name='save_sample_tables'),
     url(r'^save_table_data/', views.save_table_data, name='save_table_data'),
     url(r'^upload_attachment/', views.upload_attachment, name='upload_attachment'),
     url(r'^delete_attachment/', views.delete_attachment, name='delete_attachment'),
