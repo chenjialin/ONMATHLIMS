@@ -5,7 +5,7 @@ import sys
 import json
 import datetime
 
-from . import DbObjectDoesNotExist
+from . import DbObjectDoesNotExist, select_colums_dict
 sys.path.append('/usr/local/lib/python2.7/dist-packages')
 import django_excel as excel
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -217,15 +217,21 @@ def down_sample_info(request):
     project_number = request.GET.get('project_number', '')
     if table_name and project_number:
         if table_name == 'send_sample':
-            return excel.make_response_from_a_table(SendSample, 'xls', file_name=project_number + title[table_name] + u'结果')
+            query_sets = SendSample.objects.filter(project_number=project_number)
+            column_names = select_colums_dict.get('send_sample')
         elif table_name == 'quality_check':
-            return excel.make_response_from_a_table(QualityCheck, 'xls', file_name=project_number + title[table_name] + u'结果')
+            query_sets = QualityCheck.objects.filter(project_number=project_number)
+            column_names = select_colums_dict.get('quality_check')
         elif table_name == 'build_lib':
-            return excel.make_response_from_a_table(BuildLib, 'xls', file_name=project_number + title[table_name] + u'结果')
+            query_sets = BuildLib.objects.filter(project_number=project_number)
+            column_names = select_colums_dict.get('build_lib')
         elif table_name == 'upmachine':
-            return excel.make_response_from_a_table(UpMachine, 'xls', file_name=project_number + title[table_name] + u'结果')
+            query_sets = UpMachine.objects.filter(project_number=project_number)
+            column_names = select_colums_dict.get('upmachine')
         elif table_name == 'downmachine':
-            return excel.make_response_from_a_table(DownMachine, 'xls', file_name=project_number + title[table_name] + u'结果')
+            query_sets = DownMachine.objects.filter(project_number=project_number)
+            column_names = select_colums_dict.get('downmachine')
+        return excel.make_response_from_query_sets(query_sets, column_names, 'xls', file_name=project_number + title[table_name] + u'结果')
     else:
         JsonResponse({'msg': 'error'})
 

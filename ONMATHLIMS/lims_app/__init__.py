@@ -2,8 +2,8 @@ class DbObjectDoesNotExist(Exception):
     pass
 
 
-select_colums_dict = {'receive_sample': ['sample_name', 'express_number', 'product_num', 'sendsample_time', 'sendsample_comment'],
-                'quality_check': ['sample_id', 'sample_name', 'rin', 'concentration', 'volume', 'qualitycheck_results', 'qualitycheck_time', 'qualitycheck_comment'],
-                'build_lib': ['sample_id', 'sample_name', 'lib_id', 'lib_time', 'lib_comment'],
-                'upmachine': ['sample_id', 'sample_name', 'upmachine_type', 'upmachine_mode', 'upmachine_num', 'upmachine_time', 'upmachine_comment'],
-                'downmachine': ['sample_id', 'sample_name', 'downmachine_num', 'q20', 'q30', 'downmachine_time', 'downmachine_comment']}
+select_colums_dict = {'send_sample': ['sample_name', 'project_number', 'species', 'express_number', 'product_num', 'time', 'comment'],
+                'quality_check': ['sample_name', 'sample_id', 'project_number', 'rin', 'concentration', 'volume', 'results', 'time', 'comment'],
+                'build_lib': ['sample_id', 'sample_name', 'project_number', 'lib_id', 'time', 'comment'],
+                'upmachine': ['sample_id', 'sample_name', 'project_number', 'upmachinetype', 'mode', 'data_count', 'time', 'comment'],
+                'downmachine': ['sample_name', 'sample_id', 'project_number', 'data_count', 'q20', 'q30', 'time', 'comment']}
