@@ -171,6 +171,9 @@ def build_lib(request):
 @login_required
 def upmachine(request):
     username = request.COOKIES.get('username', '')
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
     (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='upmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upmachine.html'),
