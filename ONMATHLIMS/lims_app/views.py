@@ -19,7 +19,10 @@ from interface import search_result_ini, get_sample_info, common
 reload(sys)
 sys.setdefaultencoding('utf8')
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
+title_map = {'wait_send': u'等待送样', 'send_sample':u'样品送样', 'quality_check': u'样品质检',
+             'build_lib': u'样品建库', 'upmachine': u'样品上机', 'downmachine': u'样品下机'}
 
+flow_list = ['wait_send', 'send_sample', 'quality_check', 'build_lib', 'upmachine', 'downmachine']
 # Create your views here.
 CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -38,10 +41,18 @@ def login_required(func):
     return _decorator
 
 
+def change_status(project_id, table_name):
+    status = SampleProjectMaster.objects.get(id=project_id).status
+    if flow_list.index(status) < flow_list.index(table_name):
+        SampleProjectMaster.objects.filter(id=project_id).update(status=table_name)
+
+
 def view_todo(request, table=None):
     project_id = request.GET.get('project_id', '') or 0
     all_proj_info = get_sample_info.get_all_proj_info()
     sample_info = get_sample_info.get_sample_by_project(project_id, name=table)
+    if sample_info:
+        change_status(project_id=project_id, table_name=table)
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
     all_attachment = common.get_attachment(project_id, table)
     return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
@@ -104,7 +115,7 @@ def main(request):
         project_dict['id'] = each_project.id
         project_dict['project_number'] = each_project.project_number
         project_dict['create_time'] = each_project.create_time.split(" ")[0]
-        project_dict['status'] = each_project.status
+        project_dict['status'] = title_map.get(each_project.status)
         project_dict['cust_user'] = each_project.cust_user
         all_projects_list.append(project_dict)
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
