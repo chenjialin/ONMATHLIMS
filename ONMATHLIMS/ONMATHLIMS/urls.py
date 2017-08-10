@@ -15,8 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
-
+from lims_app import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', views.login, name='login'),
+    url(r'check_login', views.check_login, name='check_login'),
+    url(r'^register/', views.register, name='register'),
     url(r'^lims_app/', include('lims_app.urls')),
 ]

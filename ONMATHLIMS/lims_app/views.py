@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from forms import SampleProjectMasterForm, UserForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
-from models import SampleProjectMaster, SampleInfoDetail, Attachment, SendSample, QualityCheck, BuildLib, UpMachine, DownMachine
+from models import SampleProjectMaster, SampleInfoDetail, Attachment, SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, UserInfo
 from interface import search_result_ini, get_sample_info, common
 
 
@@ -32,7 +32,7 @@ def login_required(func):
     Check if already login and search record
     """
     def _decorator(request, *args, **kwargs):
-        username = request.COOKIES.get('username', '')
+        username = request.session.get('username', '')
         if username:
             return func(request, *args, **kwargs)
         else:
@@ -58,30 +58,46 @@ def view_todo(request, table=None):
     return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
 
 
-def login(request):
-    if request.method == 'POST':
-        user_form = UserForm(request.POST)
+def register(request):
+    pass
 
-        if user_form.is_valid():
-            username = request.POST.get('username', '')
-            response = HttpResponseRedirect('/lims_app/main/')
-            response.set_cookie('username', username, 3600)
-            return response
-    else:
-        user_form = UserForm()
-    return render(request, 'login.html', {'user_form': user_form})
+
+def login(request):
+    return render(request, 'login.html')
+
+
+def check_login(request):
+    if request.method == 'POST':
+        username = request.POST.get('user')
+        password = request.POST.get('password')
+        data = {'code': 1, 'msg': ''}
+        if not UserInfo.objects.filter(username=username):
+            data['msg'] = u'不存在这个用户,请注册!'
+        else:
+            user = UserInfo.objects.get(username=username)
+            if user.password != password:
+                data['msg'] = u'密码错误,请重试!'
+            elif user.status == 'N':
+                data['msg'] = u'该用户未通过验证!'
+            else:
+                data['msg'] = 'ok'
+                data['code'] = 0
+                request.session['username'] = username
+        return JsonResponse(data)
+
+    return HttpResponseRedirect('/')
 
 
 def logout(request):
-    response = HttpResponseRedirect('/lims_app/login/')
-    response.delete_cookie('username')
+    request.session.flush()
+    response = HttpResponseRedirect('/')
     return response
 
 
 def search(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     if not username:
-        response = HttpResponseRedirect('/lims_app/login/')
+        response = HttpResponseRedirect('/')
         return response
     key_word = request.GET.get('q').strip()
     table_header, table_values = search_result_ini.get_search_result(key_word)
@@ -92,7 +108,7 @@ def search(request):
 
 
 def operation_log(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     if not username:
         response = HttpResponseRedirect('/lims_app/login/')
         return response
@@ -102,7 +118,7 @@ def operation_log(request):
 
 @login_required
 def main(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
 
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
@@ -142,7 +158,7 @@ view function for onmathlims modules
 
 @login_required
 def send_sample(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
@@ -155,7 +171,7 @@ def send_sample(request):
 
 @login_required
 def quality_check(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
@@ -168,7 +184,7 @@ def quality_check(request):
 
 @login_required
 def build_lib(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
@@ -181,7 +197,7 @@ def build_lib(request):
 
 @login_required
 def upmachine(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
@@ -194,7 +210,7 @@ def upmachine(request):
 
 @login_required
 def downmachine(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
@@ -370,7 +386,7 @@ def save_table_data(request):
 
 
 def upload_attachment(request):
-    username = request.COOKIES.get('username', '')
+    username = request.session.get('username', '')
     file_name = request.GET.get("file_name").rsplit('\\')[-1]
     file_type = request.GET.get("type")
     project_id = request.GET.get("project_id")
