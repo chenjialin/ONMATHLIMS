@@ -26,17 +26,18 @@
                 </div> -->
             </div>
             <div class="box-body">
-                <table id="test" class="table table-bordered table-striped">
+                <table id="main-table" class="table table-bordered table-striped">
                   <thead>
                     <tr>
-                        <th>#</th>
                         <th>项目编号</th>
                         <th>客户名称</th>
                         <th>创建时间</th>
                         <th>状态</th>
+                        <th>项目详情</th>
                     </tr>
                   </thead>
                   <tbody>
+                    {% comment %}
                     {% for project in all_projects %}
                     <tr>
                         <td>{{project.id}}</td>
@@ -46,6 +47,7 @@
                         <td>{{project.status}}</td>
                     </tr>
                     {% endfor %}
+                    {% endcomment %}
                   </tbody>
                 </table>
             </div>
@@ -90,7 +92,28 @@
       }
     })*/
     {% endcomment %}
-      $("#test").DataTable();
+      var table = $("#main-table").DataTable({
+        "ajax": {
+          url: "{% url 'show_project_master' %}",
+          "type": "POST"
+        },
+        "columns": [
+          {"data": "project_number"},
+          {"data": "cust_user"},
+          {"data": "create_time"},
+          {"data": "status"},
+          {"data": null}
+        ],
+        "columnDefs":[{
+          "targets": -1,
+          "data": null,
+          "defaultContent": '<button class="btn btn-default btn-view">详情</button>'
+        }]
+      });
+      $("#main-table tbody").on('click', '.btn-view', function(e){
+        var data = table.row($(this).parents('tr')).data();
+        window.location.href = "/lims_app/show_project_detail?project_number=" + data['project_number'];
+      });
       $("#all_project").addClass('active');
   });
 </script>

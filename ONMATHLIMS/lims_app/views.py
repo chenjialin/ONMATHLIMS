@@ -116,6 +116,20 @@ def operation_log(request):
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'operation_log.html'))
 
 
+def show_project_master(request):
+    if request.method == 'POST':
+        all_projects = SampleProjectMaster.objects.all()
+        all_projects_list = []
+        for each_project in all_projects:
+            project_dict = {}
+            project_dict['project_number'] = each_project.project_number
+            project_dict['create_time'] = each_project.create_time.split(" ")[0]
+            project_dict['status'] = title_map.get(each_project.status)
+            project_dict['cust_user'] = each_project.cust_user
+            all_projects_list.append(project_dict)
+        return JsonResponse({'data': all_projects_list})
+
+
 @login_required
 def main(request):
     username = request.session.get('username', '')
@@ -124,18 +138,8 @@ def main(request):
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
 
-    all_projects = SampleProjectMaster.objects.all()
-    all_projects_list = []
-    for each_project in all_projects:
-        project_dict = {}
-        project_dict['id'] = each_project.id
-        project_dict['project_number'] = each_project.project_number
-        project_dict['create_time'] = each_project.create_time.split(" ")[0]
-        project_dict['status'] = title_map.get(each_project.status)
-        project_dict['cust_user'] = each_project.cust_user
-        all_projects_list.append(project_dict)
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
-                      {'username': username, 'all_projects': all_projects_list})
+                      {'username': username})
 
 
 @login_required
