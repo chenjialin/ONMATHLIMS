@@ -108,6 +108,20 @@
           "targets": -1,
           "data": null,
           "defaultContent": '<button class="btn btn-default btn-view">详情</button>'
+        },{
+          "targets": 1,
+          render: function(data, type, row, meta){
+            if(type==='display'){
+              return $('<a>')
+                      .attr('href','/lims_app/show_user_detail?user='+data)
+                      .text(data)
+                      .wrap('<div></div>')
+                      .parent()
+                      .html();
+            }else{
+              return data;
+            }
+          }
         }]
       });
       $("#main-table tbody").on('click', '.btn-view', function(e){
