@@ -336,3 +336,42 @@ class DownMachine(models.Model):
     class Meta:
         managed = False
         db_table = 'downmachine'
+
+
+class BillingInfo(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.CharField(max_length=45, blank=True, null=True)
+    billing_number = models.CharField(max_length=45, blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'billing_info'
+
+
+class ReceiptInfo(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.CharField(max_length=45, blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'receipt_info'
+
+
+class CostInfo(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.CharField(max_length=45, blank=True, null=True)
+    sample_number = models.CharField(max_length=45, blank=True, null=True)
+    unit_cost = models.CharField(max_length=45, blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'cost_info'
