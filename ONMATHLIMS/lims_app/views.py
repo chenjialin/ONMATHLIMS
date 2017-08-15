@@ -12,8 +12,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from forms import SampleProjectMasterForm, UserForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
-from models import SampleProjectMaster, SampleInfoDetail, Attachment, SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, UserInfo
-from interface import search_result_ini, get_sample_info, common
+from models import *
+from interface import search_result_ini, get_sample_info, common, get_user_cost
 
 
 reload(sys)
@@ -58,8 +58,26 @@ def view_todo(request, table=None):
     return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
 
 
-def register(request):
-    pass
+def show_expense_detail(request):
+    cust_user = request.GET.get('user', '')
+    table = request.GET.get('table', '')
+    page = request.GET.get('page', '')
+    limit = request.GET.get('rows', '')
+    sidx = request.GET.get('sidx', 'expense')
+    sord = request.GET.get('sord', '')
+    data = {}
+    page, total_pages, count, results = get_user_cost.get_expense_info(cust_user, limit, sidx, sord, page, table)
+    data['page'] = page,
+    data['total'] = total_pages,
+    data['records'] = count
+    data['rows'] = []
+    for result in results:
+        tmp_dict = {}
+        tmp_dict['id'] = result[0]
+        tmp_dict['cell'] = result[2:len(result)-2]
+        data['rows'].append(tmp_dict)
+
+    return JsonResponse(data)
 
 
 def login(request):
@@ -128,6 +146,19 @@ def show_project_master(request):
             project_dict['cust_user'] = each_project.cust_user
             all_projects_list.append(project_dict)
         return JsonResponse({'data': all_projects_list})
+
+
+@login_required
+def show_user_detail(request):
+    username = request.session.get('username', '')
+    cust_user = request.GET.get('user', '')
+
+    billing_total = get_user_cost.get_expense_total(cust_user, 'billing_info')
+    receipt_total = get_user_cost.get_expense_total(cust_user, 'receipt_info')
+    cost_total = get_user_cost.get_expense_total(cust_user, 'cost_info')
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'show_user_detail.html'),
+                  {'username': username, 'cust_user':cust_user, 'billing_total': billing_total,
+                  'receipt_total': receipt_total, 'cost_total': cost_total})
 
 
 @login_required

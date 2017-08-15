@@ -341,7 +341,7 @@ class DownMachine(models.Model):
 class BillingInfo(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, blank=True, null=True)
-    expense = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.IntegerField(blank=True, null=True)
     billing_number = models.CharField(max_length=45, blank=True, null=True)
     time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
@@ -354,7 +354,7 @@ class BillingInfo(models.Model):
 class ReceiptInfo(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, blank=True, null=True)
-    expense = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.IntegerField(blank=True, null=True)
     time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
 
@@ -366,7 +366,7 @@ class ReceiptInfo(models.Model):
 class CostInfo(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, blank=True, null=True)
-    expense = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.IntegerField(blank=True, null=True)
     sample_number = models.CharField(max_length=45, blank=True, null=True)
     unit_cost = models.CharField(max_length=45, blank=True, null=True)
     time = models.DateTimeField(blank=True, null=True)
