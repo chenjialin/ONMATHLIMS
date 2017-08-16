@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^upload_attachment/', views.upload_attachment, name='upload_attachment'),
     url(r'^delete_attachment/', views.delete_attachment, name='delete_attachment'),
     url(r'^show_user_detail/', views.show_user_detail, name='show_user_detail'),
-    url(r'^show_expense_detail/', views.show_expense_detail, name='show_expense_detail')
+    url(r'^show_expense_detail/', views.show_expense_detail, name='show_expense_detail'),
+    url(r'^down_expense_info/', views.down_expense_info, name='down_expense_info')
 ]
