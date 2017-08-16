@@ -129,16 +129,19 @@
             </div>
             <!-- /.box-header -->
             <div class="box-body">
+              <button type="submit" class="btn btn-default" onclick="down_expense_table('billing_info')">下载开票信息表</button>
               <table id="billing_table" class="table table-bordered table-striped">
               </table>
               <div id="nav_billing_table"></div>
               <p>当前开票总金额: {{ billing_total }}</p>
               <br><br>
+              <button type="submit" class="btn btn-default" onclick="down_expense_table('receipt_info')">下载收款信息表</button>
               <table id="receipt_table" class="table table-bordered table-striped">
               </table>
               <div id="nav_receipt_table"></div>
               <p>当前收款总金额: {{ receipt_total }}</p>
               <br><br>
+              <button type="submit" class="btn btn-default" onclick="down_expense_table('cost_info')">下载成本信息表</button>
               <table id="cost_table" class="table table-bordered table-striped">
               </table>
               <div id="nav_cost_table"></div>
@@ -278,6 +281,8 @@ $("#cost_table").jqGrid('navGrid', '#nav_cost_table', {
   del: false
 });
 $("#cost_table").jqGrid('inlineNav', '#nav_cost_table');
+function down_expense_table(table) {
+  window.location.href = '/lims_app/down_expense_info?table=' + table + '&user=' + '{{ cust_user }}';
+}
 </script>
-
 </html>

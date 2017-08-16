@@ -4,16 +4,15 @@ import os
 import sys
 import json
 import datetime
-
 from . import DbObjectDoesNotExist, select_colums_dict
-sys.path.append('/usr/local/lib/python2.7/dist-packages')
-import django_excel as excel
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from forms import SampleProjectMasterForm, UserForm
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
+from forms import SampleProjectMasterForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from models import *
 from interface import search_result_ini, get_sample_info, common, get_user_cost
+sys.path.append('/usr/local/lib/python2.7/dist-packages')
+import django_excel as excel
 
 
 reload(sys)
@@ -74,7 +73,7 @@ def show_expense_detail(request):
     for result in results:
         tmp_dict = {}
         tmp_dict['id'] = result[0]
-        tmp_dict['cell'] = result[2:len(result)-2]
+        tmp_dict['cell'] = result[2:len(result)-1]
         data['rows'].append(tmp_dict)
 
     return JsonResponse(data)
@@ -272,6 +271,19 @@ def save_sample_info(request):
         DownMachine.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
 
     return JsonResponse({'msg': 'ok'})
+
+
+def down_expense_info(request):
+    table_name = request.GET.get('table')
+    cust_user = request.GET.get('user')
+    file_path = get_user_cost.down_expense_table(cust_user, table_name)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=%s' % os.path.basename(file_path)
+            return response
+
+    raise Http404
 
 
 def down_sample_info(request):
