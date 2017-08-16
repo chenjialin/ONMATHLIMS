@@ -185,19 +185,20 @@
 <script src="{%  static "dist/js/adminlte.min.js" %}"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="{%  static "dist/js/demo.js" %}"></script>
-<script src="{%  static "js/jquery.jqGrid.src.js" %}"</script>
-<script src="{%  static "js/grid.locale-cn.js" %}"</script>
+<script src="{%  static "js/jquery.jqGrid.src.js" %}"></script>
+<script src="{%  static "js/grid.locale-cn.js" %}"></script>
 </body>
 <script>
 $("#billing_table").jqGrid({
   url: '/lims_app/show_expense_detail?table=billing_info',
   datatype: "json",
-  colNames: ['项目', '金额', '开票','时间', '备注'],
+  colNames: ['项目ID', '项目', '金额', '开票','时间', '备注'],
   colModel: [
-    {name: 'project_number', index: 'project_number', editable: true, width: 90},
+    {name: 'project_id', index: 'project_id', editable: false, width: 50},
+    {name: 'project_number', index: 'project_number', editable: false, width: 90},
     {name: 'expense', index: 'expense', editable: true, width: 90},
     {name: 'billing_number', index: 'billing_number', editable: true, width: 90},
-    {name: 'time', index: 'time', editable: true, width: 100},
+    {name: 'time', index: 'time', editable: true, width: 120},
     {name: 'comment', index: 'comment', editable: true, width: 150}
   ],
   rowNum: 10,
@@ -206,28 +207,31 @@ $("#billing_table").jqGrid({
   sortname: 'expense',
   sortorder: 'desc',
   viewrecords: true,
-  editurl: 'lims_app/haha',
+  editurl: '/lims_app/manage_expense_info',
   postData: {
     user: "{{ cust_user }}"
   },
   caption: '开票信息',
-  width: 900
+  width: 600
 });
-$("#billing_table").jqGrid('navGrid', '#nav_billing_table', {
-  edit: false,
-  add: false,
-  del: false
+$("#billing_table").jqGrid('navGrid', '#nav_billing_table',{
+    edit: false,
+    add:  false,
+    del:  true });
+$("#billing_table").jqGrid('inlineNav', '#nav_billing_table', {
+  editParams: {keys: true, extraparam: {table: 'billing_info', user: '{{cust_user}}'}},
+  addParams: {addRowParam: {keys: true, extraparam: {table: 'billing_info', user: '{{cust_user}}'}}}
 });
-$("#billing_table").jqGrid('inlineNav', '#nav_billing_table');
 // receipt table
 $("#receipt_table").jqGrid({
   url: '/lims_app/show_expense_detail?table=receipt_info',
   datatype: "json",
-  colNames: ['项目', '金额' ,'时间', '备注'],
+  colNames: ['项目ID', '项目', '金额' ,'时间', '备注'],
   colModel: [
-    {name: 'project_number', index: 'project_number', editable: true, width: 90},
+    {name: 'project_id', index: 'project_id', editable: false, width: 50},
+    {name: 'project_number', index: 'project_number', editable: false, width: 90},
     {name: 'expense', index: 'expense', editable: true, width: 90},
-    {name: 'time', index: 'time', editable: true, width: 100},
+    {name: 'time', index: 'time', editable: true, width: 120},
     {name: 'comment', index: 'comment', editable: true, width: 150}
   ],
   rowNum: 10,
@@ -236,30 +240,31 @@ $("#receipt_table").jqGrid({
   sortname: 'expense',
   sortorder: 'desc',
   viewrecords: true,
-  editurl: 'lims_app/haha',
+  editurl: '/lims_app/manage_expense_info',
   postData: {
     user: "{{ cust_user }}"
   },
   caption: '收款信息',
-  width: 900
+  width: 500
 });
 $("#receipt_table").jqGrid('navGrid', '#nav_receipt_table', {
   edit: false,
   add: false,
   del: false
 });
-$("#receipt_table").jqGrid('inlineNav', '#nav_receipt_table');
+//$("#receipt_table").jqGrid('inlineNav', '#nav_receipt_table');
 // cost table
 $("#cost_table").jqGrid({
   url: '/lims_app/show_expense_detail?table=cost_info',
   datatype: "json",
-  colNames: ['项目', '金额' ,'样品数量', '单价', '时间', '备注'],
+  colNames: ['项目ID', '项目', '金额' ,'样品数量', '单价', '时间', '备注'],
   colModel: [
-    {name: 'project_number', index: 'project_number', editable: true, width: 90},
+    {name: 'project_id', index: 'project_id', editable: false, width: 50},
+    {name: 'project_number', index: 'project_number', editable: false, width: 90},
     {name: 'expense', index: 'expense', editable: true, width: 90},
     {name: 'sample_number', index: 'sample_number', editable: true, width: 90},
     {name: 'unit_cost', index: 'unit_cost', editable: true, width: 90},
-    {name: 'time', index: 'time', editable: true, width: 100},
+    {name: 'time', index: 'time', editable: true, width: 120},
     {name: 'comment', index: 'comment', editable: true, width: 150}
   ],
   rowNum: 10,
@@ -268,12 +273,12 @@ $("#cost_table").jqGrid({
   sortname: 'expense',
   sortorder: 'desc',
   viewrecords: true,
-  editurl: 'lims_app/haha',
+  editurl: '/lims_app/manage_expense_info',
   postData: {
     user: "{{ cust_user }}"
   },
   caption: '成本信息',
-  width: 900
+  width: 700
 });
 $("#cost_table").jqGrid('navGrid', '#nav_cost_table', {
   edit: false,
@@ -282,7 +287,7 @@ $("#cost_table").jqGrid('navGrid', '#nav_cost_table', {
 });
 $("#cost_table").jqGrid('inlineNav', '#nav_cost_table');
 function down_expense_table(table) {
-  window.location.href = '/lims_app/down_expense_info?table=' + table + '&user=' + '{{ cust_user }}';
+  window.location.href = '/lims_app/download_expense_info?table=' + table + '&user=' + '{{ cust_user }}';
 }
 </script>
 </html>
