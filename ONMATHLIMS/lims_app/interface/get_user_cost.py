@@ -6,6 +6,9 @@ from math import ceil
 from openpyxl import Workbook
 from django.db import connection
 
+'''
+deal with user cost functions
+'''
 
 cmd_dict = {'billing_info': '''select bi.* ,sm.cust_user from billing_info bi
                                inner join sample_project_master sm on bi.project_id=sm.id

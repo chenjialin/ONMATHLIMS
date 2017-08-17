@@ -57,28 +57,6 @@ def view_todo(request, table=None):
     return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
 
 
-def show_expense_detail(request):
-    cust_user = request.GET.get('user', '')
-    table = request.GET.get('table', '')
-    page = request.GET.get('page', '')
-    limit = request.GET.get('rows', '')
-    sidx = request.GET.get('sidx', 'expense')
-    sord = request.GET.get('sord', '')
-    data = {}
-    page, total_pages, count, results = get_user_cost.get_expense_info(cust_user, limit, sidx, sord, page, table)
-    data['page'] = page,
-    data['total'] = total_pages,
-    data['records'] = count
-    data['rows'] = []
-    for result in results:
-        tmp_dict = {}
-        tmp_dict['id'] = result[0]
-        tmp_dict['cell'] = result[2:len(result)-1]
-        data['rows'].append(tmp_dict)
-
-    return JsonResponse(data)
-
-
 def login(request):
     return render(request, 'login.html')
 
@@ -145,19 +123,6 @@ def show_project_master(request):
             project_dict['cust_user'] = each_project.cust_user
             all_projects_list.append(project_dict)
         return JsonResponse({'data': all_projects_list})
-
-
-@login_required
-def show_user_detail(request):
-    username = request.session.get('username', '')
-    cust_user = request.GET.get('user', '')
-
-    billing_total = get_user_cost.get_expense_total(cust_user, 'billing_info')
-    receipt_total = get_user_cost.get_expense_total(cust_user, 'receipt_info')
-    cost_total = get_user_cost.get_expense_total(cust_user, 'cost_info')
-    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'show_user_detail.html'),
-                  {'username': username, 'cust_user':cust_user, 'billing_total': billing_total,
-                  'receipt_total': receipt_total, 'cost_total': cost_total})
 
 
 @login_required
@@ -271,19 +236,6 @@ def save_sample_info(request):
         DownMachine.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
 
     return JsonResponse({'msg': 'ok'})
-
-
-def down_expense_info(request):
-    table_name = request.GET.get('table')
-    cust_user = request.GET.get('user')
-    file_path = get_user_cost.down_expense_table(cust_user, table_name)
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type="application/vnd.ms-excel")
-            response['Content-Disposition'] = 'inline; filename=%s' % os.path.basename(file_path)
-            return response
-
-    raise Http404
 
 
 def down_sample_info(request):
@@ -467,3 +419,119 @@ def delete_attachment(request):
     Attachment.objects.filter(project_id=project_id, filename=file_name, file_type=file_type).delete()
 
     return HttpResponse(json.dumps({"ret": True}))
+
+
+'''
+add user expense page and functions
+'''
+
+
+@login_required
+def show_user_detail(request):
+    username = request.session.get('username', '')
+    cust_user = request.GET.get('user', '')
+
+    billing_total = get_user_cost.get_expense_total(cust_user, 'billing_info')
+    receipt_total = get_user_cost.get_expense_total(cust_user, 'receipt_info')
+    cost_total = get_user_cost.get_expense_total(cust_user, 'cost_info')
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'show_user_detail.html'),
+                  {'username': username, 'cust_user':cust_user, 'billing_total': billing_total,
+                  'receipt_total': receipt_total, 'cost_total': cost_total})
+
+
+def down_expense_info(request):
+    table_name = request.GET.get('table')
+    cust_user = request.GET.get('user')
+    file_path = get_user_cost.down_expense_table(cust_user, table_name)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=%s' % os.path.basename(file_path)
+            return response
+
+    raise Http404
+
+
+def show_expense_detail(request):
+    cust_user = request.GET.get('user', '')
+    table = request.GET.get('table', '')
+    page = request.GET.get('page', '')
+    limit = request.GET.get('rows', '')
+    sidx = request.GET.get('sidx', 'expense')
+    sord = request.GET.get('sord', '')
+    data = {}
+    page, total_pages, count, results = get_user_cost.get_expense_info(cust_user, limit, sidx, sord, page, table)
+    data['page'] = page,
+    data['total'] = total_pages,
+    data['records'] = count
+    data['rows'] = []
+    for result in results:
+        tmp_dict = {}
+        tmp_dict['id'] = result[0]
+        tmp_dict['cell'] = result[1:len(result)-1]
+        data['rows'].append(tmp_dict)
+
+    return JsonResponse(data)
+
+
+def manage_expense_info(request):
+    if request.method == 'POST':
+        oper = request.POST['oper']
+        if request.POST.get('billing_number'):
+            table_name = 'billing_info'
+        elif request.POST.get('sample_number'):
+            table_name = 'cost_info'
+        else:
+            table_name = 'receipt_info'
+
+        if oper == 'del':
+            if table_name == 'billing_info':
+                BillingInfo.objects.filter(id=request.POST['id']).delete()
+            elif table_name == 'receipt_info':
+                ReceiptInfo.objects.filter(id=request.POST['id']).delete()
+            else:
+                CostInfo.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse({'msg': 'ok'})
+        elif oper == 'add':
+            if table_name == 'billing_info':
+                new_row = BillingInfo(project_id=request.POST['project_id'],
+                                      project_number=request.POST['project_number'],
+                                      expense=request.POST['expense'],
+                                      billing_number=request.POST['billing_number'],
+                                      time=datetime.datetime.now(),
+                                      comment=request.POST['comment']
+                                      )
+            elif table_name == 'receipt_info':
+                new_row = ReceiptInfo(project_id=request.POST['project_id'],
+                                      project_number=request.POST['project_number'],
+                                      expense=request.POST['expense'],
+                                      time=datetime.datetime.now(),
+                                      comment=request.POST['comment'])
+            else:
+                new_row = CostInfo(project_id=request.POST['project_id'],
+                                   project_number=request.POST['project_number'],
+                                   expense=request.POST['expense'],
+                                   sample_number=request.POST['sample_number'],
+                                   unit_cost=request.POST['unit_cost'],
+                                   time=datetime.datetime.now(),
+                                   comment=request.POST['comment'])
+            new_row.save()
+            return HttpResponse({'msg': 'ok'})
+        else:
+            if table_name == 'billing_info':
+                BillingInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                         billing_number=request.POST['billing_number'],
+                                                                         time=datetime.datetime.now(),
+                                                                         comment=request.POST['comment']
+                                                                         )
+            elif table_name == 'receipt_info':
+                ReceiptInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                         time=datetime.datetime.now(),
+                                                                         comment=request.POST['comment'])
+            else:
+                CostInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                      sample_number=request.POST['sample_number'],
+                                                                      unit_cost=request.POST['unit_cost'],
+                                                                      time=datetime.datetime.now(),
+                                                                      comment=request.POST['comment'])
+            return HttpResponse({'msg': 'ok'})
