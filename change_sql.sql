@@ -31,3 +31,40 @@ CREATE TABLE `SEQ_SA_INFO`.`cost_info` (
       `comment` VARCHAR(100) NULL,
       PRIMARY KEY (`id`))
       ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/* 2017-08-17 alter tables:
+- send_sample
+- quality_check
+- build_lib
+- upmachine
+- downmachine
+add upload_time save and om_id three fields
+*/
+ALTER TABLE `SEQ_SA_INFO`.`send_sample`
+CHANGE COLUMN `time` `create_time` DATETIME NULL DEFAULT NULL ,
+ADD COLUMN `upload_time` DATETIME NULL AFTER `comment`,
+ADD COLUMN `save` VARCHAR(1) NULL AFTER `upload_time`,
+ADD COLUMN `om_id` VARCHAR(100) NULL AFTER `species`;
+
+ALTER TABLE `SEQ_SA_INFO`.`quality_check`
+CHANGE COLUMN `time` `create_time` DATETIME NULL DEFAULT NULL ,
+ADD COLUMN `upload_time` DATETIME NULL AFTER `comment`,
+ADD COLUMN `save` VARCHAR(1) NULL AFTER `upload_time`,
+ADD COLUMN `om_id` VARCHAR(100) NULL AFTER `sample_name`;
+
+ALTER TABLE `SEQ_SA_INFO`.`build_lib`
+CHANGE COLUMN `time` `create_time` DATETIME NULL DEFAULT NULL ,
+ADD COLUMN `upload_time` DATETIME NULL AFTER `comment`,
+ADD COLUMN `save` VARCHAR(1) NULL AFTER `upload_time`,
+ADD COLUMN `om_id` VARCHAR(100) NULL AFTER `sample_name`;
+
+ALTER TABLE `SEQ_SA_INFO`.`upmachine`
+CHANGE COLUMN `time` `create_time` DATETIME NULL DEFAULT NULL ,
+ADD COLUMN `upload_time` DATETIME NULL AFTER `comment`,
+ADD COLUMN `save` VARCHAR(1) NULL AFTER `upload_time`,
+ADD COLUMN `om_id` VARCHAR(100) NULL AFTER `sample_name`;
+
+ALTER TABLE `SEQ_SA_INFO`.`downmachine`
+CHANGE COLUMN `time` `create_time` DATETIME NULL DEFAULT NULL ,
+ADD COLUMN `upload_time` DATETIME NULL AFTER `comment`,
+ADD COLUMN `save` VARCHAR(1) NULL AFTER `upload_time`,
+ADD COLUMN `om_id` VARCHAR(100) NULL AFTER `sample_name`;
