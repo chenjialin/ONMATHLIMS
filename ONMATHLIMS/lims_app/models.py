@@ -264,10 +264,13 @@ class SendSample(models.Model):
     project_number = models.CharField(max_length=45, unique=True)
     sample_name = models.CharField(max_length=45)
     species = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
     express_number = models.CharField(max_length=45, blank=True, null=True)
     product_num = models.CharField(max_length=45, blank=True, null=True)
-    time = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.DateTimeField(blank=True, null=True)
+    save = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -278,13 +281,16 @@ class QualityCheck(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, unique=True)
     sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
     sample_id = models.CharField(max_length=45, unique=True)
     concentration = models.CharField(max_length=45, blank=True, null=True)
     volume = models.CharField(max_length=45, blank=True, null=True)
     rin = models.CharField(max_length=45, blank=True, null=True)
     results = models.CharField(max_length=1, blank=True, null=True)
-    time = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.DateTimeField(blank=True, null=True)
+    save = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -295,10 +301,13 @@ class BuildLib(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, unique=True)
     sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
     sample_id = models.CharField(max_length=45, unique=True)
     lib_id = models.CharField(max_length=45, blank=True, null=True)
-    time = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.DateTimeField(blank=True, null=True)
+    save = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -309,12 +318,15 @@ class UpMachine(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, unique=True)
     sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
     sample_id = models.CharField(max_length=45, unique=True)
     upmachinetype = models.CharField(max_length=45, blank=True, null=True)
     mode = models.CharField(max_length=45, blank=True, null=True)
     data_count = models.CharField(max_length=45, blank=True, null=True)
-    time = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.DateTimeField(blank=True, null=True)
+    save = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -325,13 +337,16 @@ class DownMachine(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, unique=True)
     sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
     sample_id = models.CharField(max_length=45, unique=True)
     data_count = models.CharField(max_length=45, blank=True, null=True)
     q20 = models.CharField(max_length=45, blank=True, null=True)
     q30 = models.CharField(max_length=45, blank=True, null=True)
     data_count = models.CharField(max_length=45, blank=True, null=True)
-    time = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.DateTimeField(blank=True, null=True)
+    save = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
