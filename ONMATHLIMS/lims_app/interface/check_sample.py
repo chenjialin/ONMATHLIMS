@@ -34,6 +34,7 @@ def check_sample(table, project_id, new_ids):
 
     cmd = "select om_id from %s where project_id='%s'" % (before_table, project_id)
     results = get_db_data(cmd)
+    results = [result[0] for result in results]
 
     if not set(new_ids).issubset(set(results)):
         return False
@@ -47,7 +48,7 @@ def split_data(table, project_id, json_data):
     om_ids = []
     for row_dict in json_data:
         om_ids.append(row_dict['om_id'])
-    old_id_set = set(results)
+    old_id_set = set([result[0] for result in results])
     new_id_set = set(om_ids)
     insert_id = list(new_id_set.difference(old_id_set))
     insert_data = []
@@ -65,9 +66,9 @@ def import_data(table, project_id, json_data):
     project_number = SampleProjectMaster.objects.get(id=project_id).project_number
     if table == 'send_sample':
         if json_data[0].get('om_id'):
-            insert_data, update_data = split_data(table, project_id, json_data)
-            for row_dict in update_data:
-                SendSample.objects.filter(om_id=[row_dict], save='Y').update(save='N')
+            # insert_data, update_data = split_data(table, project_id, json_data)
+            for row_dict in json_data:
+                SendSample.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
                 p = SendSample(project_number=project_number,
                                project_id=project_id,
                                sample_name=row_dict['sample_name'],
@@ -77,19 +78,22 @@ def import_data(table, project_id, json_data):
                                product_num=row_dict['product_num'],
                                create_time=row_dict['time'],
                                comment=row_dict['comment'],
-                               upload_time=datetime.datetime.now(),
-                               save='Y')
+                               upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                               status='Y')
                 p.save()
-                return JsonResponse({'msg': 'ok'})
-
+            return JsonResponse({'msg': u'更新成功!'})
         else:
             sample_type = get_sample_type(project_id)
-            prefix = ''.join(['P', str(project_id), sample_type, datetime.datetime.now().date().strftime("%y%m")])
+            prefix = ''.join(['P', str(project_id), sample_type, datetime.datetime.now().date().strftime("%y%m"),'N'])
             cmd = "select om_id from %s where project_id='%s'" % (table, project_id)
             results = get_db_data(cmd)
-            max_number = max([int(result.split('N')[1]) for result in results])+1
+            if results:
+                max_number = max([int(result[0].split('N')[1]) for result in results])+1
+            else:
+                max_number = 1
+
             for i, row_dict in enumerate(json_data):
-                om_id = prefix + str(i+max_number)
+                om_id = ''.join([prefix, str(i+max_number)])
                 p = SendSample(project_number=project_number,
                                project_id=project_id,
                                sample_name=row_dict['sample_name'],
@@ -99,10 +103,10 @@ def import_data(table, project_id, json_data):
                                product_num=row_dict['product_num'],
                                create_time=row_dict['time'],
                                comment=row_dict['comment'],
-                               upload_time=datetime.datetime.now(),
-                               save='Y')
+                               upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                               status='Y')
                 p.save()
-                return JsonResponse({'msg': 'ok'})
+            return JsonResponse({'msg': u'导入成功!'})
 
     elif table == 'quality_check':
         om_ids = [row_dict['om_id'] for row_dict in json_data]
@@ -110,7 +114,7 @@ def import_data(table, project_id, json_data):
             insert_data, update_data = split_data(table, project_id, json_data)
             if update_data:
                 for row_dict in update_data:
-                    QualityCheck.objects.filter(om_id=row_dict['om_id'], save='Y').update(save='N')
+                    QualityCheck.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
             for row_dict in json_data:
                 p = QualityCheck(project_id=project_id,
                                  project_number=project_number,
@@ -123,10 +127,10 @@ def import_data(table, project_id, json_data):
                                  results=row_dict['results'],
                                  create_time=row_dict['time'],
                                  comment=row_dict['comment'],
-                                 upload_time=datetime.datetime.now(),
-                                 save='Y')
+                                 upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                                 status='Y')
                 p.save()
-                return JsonResponse({'msg': 'ok'})
+            return JsonResponse({'msg': u'导入成功!'})
         else:
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     elif table == 'build_lib':
@@ -135,7 +139,7 @@ def import_data(table, project_id, json_data):
             insert_data, update_data = split_data(table, project_id, json_data)
             if update_data:
                 for row_dict in update_data:
-                    BuildLib.objects.filter(om_id=row_dict['om_id'], save='Y').update(save='N')
+                    BuildLib.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
             for row_dict in json_data:
                 p = BuildLib(project_id=project_id,
                              project_number=project_number,
@@ -145,10 +149,10 @@ def import_data(table, project_id, json_data):
                              lib_id=row_dict['lib_id'],
                              create_time=row_dict['time'],
                              comment=row_dict['comment'],
-                             upload_time=datetime.datetime.now(),
-                             save='Y')
+                             upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                             status='Y')
                 p.save()
-                return JsonResponse({'msg': 'ok'})
+            return JsonResponse({'msg': u'导入成功!'})
         else:
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     elif table == 'upmachine':
@@ -157,7 +161,7 @@ def import_data(table, project_id, json_data):
             insert_data, update_data = split_data(table, project_id, json_data)
             if update_data:
                 for row_dict in update_data:
-                    UpMachine.objects.filter(om_id=row_dict['om_id'], save='Y').update(save='N')
+                    UpMachine.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
             for row_dict in json_data:
                 p = UpMachine(project_id=project_id,
                               project_number=project_number,
@@ -169,10 +173,10 @@ def import_data(table, project_id, json_data):
                               data_count=row_dict['data_count'],
                               create_time=row_dict['time'],
                               comment=row_dict['comment'],
-                              upload_time=datetime.datetime.now(),
-                              save='Y')
+                              upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                              status='Y')
                 p.save()
-                return JsonResponse({'msg': 'ok'})
+            return JsonResponse({'msg': u'导入成功!'})
         else:
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     elif table == 'downmachine':
@@ -181,7 +185,7 @@ def import_data(table, project_id, json_data):
             insert_data, update_data = split_data(table, project_id, json_data)
             if update_data:
                 for row_dict in update_data:
-                    DownMachine.objects.filter(om_id=row_dict['om_id'], save='Y').update(save='N')
+                    DownMachine.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
             for row_dict in json_data:
                 p = DownMachine(project_id=project_id,
                                 project_number=project_number,
@@ -193,11 +197,77 @@ def import_data(table, project_id, json_data):
                                 data_count=row_dict['data_count'],
                                 create_time=row_dict['time'],
                                 comment=row_dict['comment'],
-                                upload_time=datetime.datetime.now(),
-                                save='Y')
+                                upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                                status='Y')
                 p.save()
-                return JsonResponse({'msg': 'ok'})
+            return JsonResponse({'msg': u'导入成功!'})
         else:
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     else:
-        return JsonResponse({'msg': 'error'})
+        return JsonResponse({'msg': 'error!'})
+
+
+def recover_data(project_id, table, upload_time, action):
+    '''
+    recover data at most three times
+    upload_time format: "%Y-%m-%d %H:%M"
+    '''
+
+    # upload_time = datetime.datetime.strptime(upload_time, "%Y-%m-%d %H:%M")
+    if table == 'send_sample':
+        if action == 'recover':
+            SendSample.objects.filter(project_id=project_id,
+                                      upload_time=upload_time,
+                                      status='N').update(status='Y')
+            return JsonResponse({'msg': u'重置成功!'})
+        else:
+            SendSample.objects.filter(project_id=project_id,
+                                      upload_time=upload_time,
+                                      status='Y').update(status='N')
+            return JsonResponse({'msg': u'删除成功!'})
+    elif table == 'quality_check':
+        if action == 'recover':
+            QualityCheck.objects.filter(project_id=project_id,
+                                        upload_time=upload_time,
+                                        status='N').update(status='Y')
+            return JsonResponse({'msg': u'重置成功!'})
+        else:
+            QualityCheck.objects.filter(project_id=project_id,
+                                        upload_time=upload_time,
+                                        status='Y').update(status='N')
+            return JsonResponse({'msg': u'删除成功!'})
+    elif table == 'build_lib':
+        if action == 'recover':
+            BuildLib.objects.filter(project_id=project_id,
+                                    upload_time=upload_time,
+                                    status='N').update(status='Y')
+            return JsonResponse({'msg': u'重置成功!'})
+        else:
+            BuildLib.objects.filter(project_id=project_id,
+                                    upload_time=upload_time,
+                                    status='Y').update(status='N')
+            return JsonResponse({'msg': u'删除成功!'})
+    elif table == 'upmachine':
+        if action == 'recover':
+            UpMachine.objects.filter(project_id=project_id,
+                                     upload_time=upload_time,
+                                     status='N').update(status='Y')
+            return JsonResponse({'msg': u'重置成功!'})
+        else:
+            UpMachine.objects.filter(project_id=project_id,
+                                     upload_time=upload_time,
+                                     status='Y').update(status='N')
+            return JsonResponse({'msg': u'删除成功!'})
+    elif table == 'downmachine':
+        if action == 'recover':
+            DownMachine.objects.filter(project_id=project_id,
+                                       upload_time=upload_time,
+                                       status='N').update(status='Y')
+            return JsonResponse({'msg': u'重置成功!'})
+        else:
+            DownMachine.objects.filter(project_id=project_id,
+                                       upload_time=upload_time,
+                                       status='Y').update(status='N')
+            return JsonResponse({'msg': u'删除成功!'})
+    else:
+        return JsonResponse({'msg': 'error!'})
