@@ -10,7 +10,7 @@ from forms import SampleProjectMasterForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from models import *
-from interface import search_result_ini, get_sample_info, common, get_user_cost
+from interface import search_result_ini, get_sample_info, common, get_user_cost, check_sample
 sys.path.append('/usr/local/lib/python2.7/dist-packages')
 import django_excel as excel
 
@@ -54,7 +54,8 @@ def view_todo(request, table=None):
         change_status(project_id=project_id, table_name=table)
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
     all_attachment = common.get_attachment(project_id, table)
-    return (project_id, all_proj_info, sample_info, select_proj, all_attachment)
+    all_upload_times = get_sample_info.get_upload_time(project_id=project_id, name=table)
+    return (project_id, all_proj_info, sample_info, select_proj, all_attachment, all_upload_times)
 
 
 def login(request):
@@ -119,7 +120,7 @@ def show_project_master(request):
             project_dict = {}
             project_dict['project_number'] = each_project.project_number
             project_dict['create_time'] = each_project.create_time.split(" ")[0]
-            project_dict['status'] = title_map.get(each_project.status)
+            #project_dict['status'] = title_map.get(each_project.status)
             project_dict['cust_user'] = each_project.cust_user
             all_projects_list.append(project_dict)
         return JsonResponse({'data': all_projects_list})
@@ -161,11 +162,12 @@ def send_sample(request):
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='send_sample')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment, all_upload_times) = view_todo(request, table='send_sample')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'receive_sample.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                   'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
+                   'select_proj': select_proj, 'project_id': project_id,
+                   'all_attachment': all_attachment, 'all_upload_times': all_upload_times})
 
 
 @login_required
@@ -174,11 +176,12 @@ def quality_check(request):
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='quality_check')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment, all_upload_times) = view_todo(request, table='quality_check')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'quality_check.html'),
                   {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                   'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
+                   'select_proj': select_proj, 'project_id': project_id,
+                   'all_attachment': all_attachment, 'all_upload_times': all_upload_times})
 
 
 @login_required
@@ -187,11 +190,12 @@ def build_lib(request):
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='build_lib')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment, all_upload_times) = view_todo(request, table='build_lib')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'build_lib.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                     'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
+                     'select_proj': select_proj, 'project_id': project_id,
+                     'all_attachment': all_attachment, 'all_upload_times': all_upload_times})
 
 
 @login_required
@@ -200,11 +204,12 @@ def upmachine(request):
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='upmachine')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment, all_upload_times) = view_todo(request, table='upmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'upmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                     'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
+                     'select_proj': select_proj, 'project_id': project_id,
+                     'all_attachment': all_attachment, 'all_upload_times': all_upload_times})
 
 
 @login_required
@@ -213,11 +218,12 @@ def downmachine(request):
     if 'search' in request.GET.keys() or 'q' in request.GET.keys():
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
-    (project_id, all_proj_info, sample_info, select_proj, all_attachment) = view_todo(request, table='downmachine')
+    (project_id, all_proj_info, sample_info, select_proj, all_attachment, all_upload_times) = view_todo(request, table='downmachine')
 
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'downmachine.html'),
                     {'username': username, 'proj_info': all_proj_info, 'sample_info': sample_info,
-                     'select_proj': select_proj, 'project_id': project_id, 'all_attachment': all_attachment})
+                     'select_proj': select_proj, 'project_id': project_id,
+                     'all_attachment': all_attachment, 'all_upload_times': all_upload_times})
 
 
 def save_sample_info(request):
@@ -246,19 +252,19 @@ def down_sample_info(request):
     project_number = request.GET.get('project_number', '')
     if table_name and project_number:
         if table_name == 'send_sample':
-            query_sets = SendSample.objects.filter(project_number=project_number)
+            query_sets = SendSample.objects.filter(project_number=project_number, status='Y')
             column_names = select_colums_dict.get('send_sample')
         elif table_name == 'quality_check':
-            query_sets = QualityCheck.objects.filter(project_number=project_number)
+            query_sets = QualityCheck.objects.filter(project_number=project_number, status='Y')
             column_names = select_colums_dict.get('quality_check')
         elif table_name == 'build_lib':
-            query_sets = BuildLib.objects.filter(project_number=project_number)
+            query_sets = BuildLib.objects.filter(project_number=project_number, status='Y')
             column_names = select_colums_dict.get('build_lib')
         elif table_name == 'upmachine':
-            query_sets = UpMachine.objects.filter(project_number=project_number)
+            query_sets = UpMachine.objects.filter(project_number=project_number, status='Y')
             column_names = select_colums_dict.get('upmachine')
         elif table_name == 'downmachine':
-            query_sets = DownMachine.objects.filter(project_number=project_number)
+            query_sets = DownMachine.objects.filter(project_number=project_number, status='Y')
             column_names = select_colums_dict.get('downmachine')
         return excel.make_response_from_query_sets(query_sets, column_names, 'xls', file_name=project_number + title[table_name] + u'结果')
     else:
@@ -287,85 +293,12 @@ def save_sample_table(request):
     json_data = request.POST['sample_table_data']
     json_data = json.loads(json_data)
     project_id = request.POST['project_id']
-    action = request.POST['action']
     table_name = request.POST['table']
-
-    project_number = SampleProjectMaster.objects.get(id=project_id).project_number
-
-    if table_name == 'send_sample':
-        if action == 'update':
-            SendSample.objects.filter(project_id=project_id).delete()
-        for row_dict in json_data:
-            p = SendSample(project_number=project_number,
-                           project_id=project_id,
-                           sample_name=row_dict['sample_name'],
-                           species=row_dict['species'],
-                           express_number=row_dict['express_number'],
-                           product_num=row_dict['product_num'],
-                           time=row_dict['time'],
-                           comment=row_dict['comment'])
-            p.save()
-    elif table_name == 'quality_check':
-        if action == 'update':
-            QualityCheck.objects.filter(project_id=project_id).delete()
-        for row_dict in json_data:
-            p = QualityCheck(project_id=project_id,
-                             project_number=project_number,
-                             sample_name=row_dict['sample_name'],
-                             sample_id=row_dict['sample_id'],
-                             concentration=row_dict['concentration'],
-                             volume=row_dict['volume'],
-                             rin=row_dict['rin'],
-                             results=row_dict['results'],
-                             time=row_dict['time'],
-                             comment=row_dict['comment'])
-            p.save()
-    elif table_name == 'build_lib':
-        if action == 'update':
-            BuildLib.objects.filter(project_id=project_id).delete()
-        for row_dict in json_data:
-            p = BuildLib(project_id=project_id,
-                         project_number=project_number,
-                         sample_name=row_dict['sample_name'],
-                         sample_id=row_dict['sample_id'],
-                         lib_id=row_dict['lib_id'],
-                         time=row_dict['time'],
-                         comment=row_dict['comment'])
-            p.save()
-    elif table_name == 'upmachine':
-        if action == 'update':
-            UpMachine.objects.filter(project_id=project_id).delete()
-        for row_dict in json_data:
-            p = UpMachine(project_id=project_id,
-                          project_number=project_number,
-                          sample_name=row_dict['sample_name'],
-                          sample_id=row_dict['sample_id'],
-                          upmachinetype=row_dict['upmachinetype'],
-                          mode=row_dict['mode'],
-                          data_count=row_dict['data_count'],
-                          time=row_dict['time'],
-                          comment=row_dict['comment']
-                          )
-            p.save()
-    elif table_name == 'downmachine':
-        if action == 'update':
-            DownMachine.objects.filter(project_id=project_id).delete()
-        for row_dict in json_data:
-            p = DownMachine(project_id=project_id,
-                            project_number=project_number,
-                            sample_name=row_dict['sample_name'],
-                            sample_id=row_dict['sample_id'],
-                            q20=row_dict['q20'],
-                            q30=row_dict['q30'],
-                            data_count=row_dict['data_count'],
-                            time=row_dict['time'],
-                            comment=row_dict['comment'])
-            p.save()
-    else:
-        return JsonResponse({'msg': '操作失败!'})
-    return JsonResponse({'msg': u'操作成功!'})
+    response = check_sample.import_data(table_name, project_id, json_data)
+    return response
 
 
+'''
 def save_table_data(request):
     json_data = request.POST['json_data']
     project_id = request.POST['project_id']
@@ -382,6 +315,7 @@ def save_table_data(request):
                                         sendsample_comment=row_dict['样品备注'])
 
     return redirect('/lims_app/send_sample/?project_id=%s' % project_id)
+'''
 
 
 def upload_attachment(request):
@@ -535,3 +469,13 @@ def manage_expense_info(request):
                                                                       time=datetime.datetime.now(),
                                                                       comment=request.POST['comment'])
             return HttpResponse({'msg': 'ok'})
+
+
+def recover_data(request):
+    table = request.GET.get('table', '')
+    project_id = request.GET.get('project_id', '')
+    upload_time = request.GET.get('upload_time', '')
+    action = request.GET.get('action', '')
+
+    response = check_sample.recover_data(project_id, table, upload_time, action)
+    return response
