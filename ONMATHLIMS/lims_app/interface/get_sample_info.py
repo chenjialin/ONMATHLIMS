@@ -41,7 +41,7 @@ def get_sample_by_project(project_id, name):
     :return:
     where project_id='%s'
     """
-    cmd = "select * from %s where project_id='%s'" % (name, project_id)
+    cmd = "select * from %s where project_id='%s' and status='Y'" % (name, project_id)
 
     cursor = connection.cursor()
     cursor.execute(cmd)
@@ -57,3 +57,13 @@ def get_user_id_by_name(username):
     result = cursor.fetchone()
 
     return result[0] if result else 0
+
+
+def get_upload_time(project_id, name, limit=3):
+    cmd = "select distinct upload_time,status from %s where project_id='%s' order by upload_time desc limit 1,%s" % (name, project_id, limit)
+
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    results = cursor.fetchall()
+
+    return results
