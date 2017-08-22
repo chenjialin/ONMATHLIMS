@@ -229,7 +229,7 @@ class UserInfo(models.Model):
     sex = models.CharField(max_length=2, blank=True, null=True)
     role = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
-    update_time = models.DateTimeField(blank=True, null=True)
+    update_time = models.CharField(max_length=45, blank=True, null=True)
     status = models.CharField(max_length=45, blank=True, null=True)
     field = models.CharField(max_length=100, blank=True, null=True)
     notes = models.CharField(max_length=200, blank=True, null=True)
@@ -269,8 +269,8 @@ class SendSample(models.Model):
     product_num = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
-    upload_time = models.DateTimeField(blank=True, null=True)
-    save = models.CharField(max_length=1, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -289,8 +289,8 @@ class QualityCheck(models.Model):
     results = models.CharField(max_length=1, blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
-    upload_time = models.DateTimeField(blank=True, null=True)
-    save = models.CharField(max_length=1, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -306,8 +306,8 @@ class BuildLib(models.Model):
     lib_id = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
-    upload_time = models.DateTimeField(blank=True, null=True)
-    save = models.CharField(max_length=1, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -325,8 +325,8 @@ class UpMachine(models.Model):
     data_count = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
-    upload_time = models.DateTimeField(blank=True, null=True)
-    save = models.CharField(max_length=1, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -345,8 +345,8 @@ class DownMachine(models.Model):
     data_count = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
-    upload_time = models.DateTimeField(blank=True, null=True)
-    save = models.CharField(max_length=1, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
         managed = False
