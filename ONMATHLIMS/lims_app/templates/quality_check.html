@@ -38,17 +38,19 @@
                   <thead>
                     <tr>
                         <th>样品名称</th>
+                        <th>OMID<th>
                         <th>样品编号</th>
                         <th>浓度</th>
                         <th>体积</th>
                         <th>RIN值</th>
                         <th>判定结果</th>
-                        <th>修改日期</th>
+                        <th>创建时间</th>
                         <th>样品备注</th>
+                        <th>上传时间</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11 in sample_info %}
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14 in sample_info %}
                     <tr>
                         <td>{{ n4 }}</td>
                         <td>{{ n5 }}</td>
@@ -57,13 +59,48 @@
                         <td>{{ n8 }}</td>
                         <td>{{ n9 }}</td>
                         <td>{{ n10 }}</td>
-                        <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n11 }}</a></td>
+                        <td>{{ n11 | date:"Y年m月d日 H时i分" }}</td>
+                        <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n12 }}</a></td>
+                        <td>{{ n13 }}<td>
+
                     </tr>
                     {% endfor %}
                   </tbody>
                 </table>
             </div>
             <!-- /.box-body -->
+            <!-- recover_data -->
+            <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">数据重置与删除</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body no-padding">
+              <table class="table table-bordered table-condensed">
+                    <thead>
+                        <tr><th>上传时间</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                      {% for n1,n2 in all_upload_times %}
+                          <tr>
+                              <td>{{ n1 }}</td>
+                              {% if n2 == 'N' %}
+                              <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">重置</button></td>
+                              {% else %}
+                              <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">删除</button></td>
+                              {% endif %}
+                          </tr>
+                      {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
             <div class="row">
         <div class="col-xs-12">
             <div class="box">
@@ -153,6 +190,19 @@
         }, function () {
             obj.parentNode.parentNode.remove();
         })
+    }
+    function recover_data(obj, upload_time, status) {
+      if(status == 'Y'){
+        action = 'delete';
+      }else{
+        action = 'recover';
+      }
+      ajaxSend('/lims_app/recover_data', {'upload_time': upload_time,
+            'project_id': project_id, 'table': 'quality_check', 'action': action},function(data){
+              alert(data.msg);
+              obj.parentNode.parentNode.remove();
+              window.location.href = "/lims_app/quality_check/?project_id=" + project_id;
+            })
     }
 
     function uploadFile() {
