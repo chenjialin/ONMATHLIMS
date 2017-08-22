@@ -19,11 +19,12 @@ urlpatterns = [
     url(r'^upload_sample_info/', views.upload_sample_info, name='upload_sample_info'),
     url(r'^save_sample_row/', views.save_sample_row, name='save_sample_row'),
     url(r'^save_sample_table/', views.save_sample_table, name='save_sample_tables'),
-    url(r'^save_table_data/', views.save_table_data, name='save_table_data'),
+    #url(r'^save_table_data/', views.save_table_data, name='save_table_data'),
     url(r'^upload_attachment/', views.upload_attachment, name='upload_attachment'),
     url(r'^delete_attachment/', views.delete_attachment, name='delete_attachment'),
     url(r'^show_user_detail/', views.show_user_detail, name='show_user_detail'),
     url(r'^show_expense_detail/', views.show_expense_detail, name='show_expense_detail'),
     url(r'^download_expense_info/', views.down_expense_info, name='down_expense_info'),
-    url(r'^manage_expense_info/', views.manage_expense_info, name='manage_expense_info')
+    url(r'^manage_expense_info/', views.manage_expense_info, name='manage_expense_info'),
+    url(r'^recover_data/', views.recover_data, name='recover_data')
 ]
