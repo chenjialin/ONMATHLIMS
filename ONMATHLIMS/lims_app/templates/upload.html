@@ -39,6 +39,8 @@
                       <a href="{% static "download/downmachine.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% elif table == 'send_sample' %}
                       <a href="{% static "download/send_sample.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
+                  {% elif table == 'return_sample' %}
+                      <a href="{% static "download/return_sample.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% endif %}
                   <input type="file" accept=" application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="upload_excel" />
                 </span>
@@ -79,6 +81,8 @@
     <script src="{% static 'js/downmachine.js' %}"></script>
   {% elif table == 'send_sample' %}
     <script src="{% static 'js/send_sample.js' %}"></script>
+  {% elif table == 'return_sample' %}
+    <script src="{% static 'js/return_sample.js' %}"></script>
   {% endif %}
   <script>
   /*
@@ -87,7 +91,7 @@
           $("#receive_sample").addClass("active");
       });
   */
-  var project_id = {{ project_id }};
+  var project_id = '{{ project_id }}';
   var table = "{{ table }}";
 
   var table_map  =  {'样品编号':'sample_id',
@@ -108,7 +112,8 @@
                      'q30': 'q30',
                      '时间': 'time',
                      '备注': 'comment',
-                     'OMID': 'om_id'}
+                     'OMID': 'om_id',
+                     '所在地': 'location'}
 
   function save_sample_table() {
     var ids = $("#table").getDataIDs();

@@ -59,10 +59,11 @@
                         <th>创建日期</th>
                         <th>样品备注</th>
                         <th>上传日期</th>
+                        <th>所在地</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13 in sample_info %}
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14 in sample_info %}
                         <tr>
                             <td>{{ n4 }}</td>
                             <td>{{ n5 }}</td>
@@ -73,6 +74,7 @@
                             <td>{{ n10 | date:"Y年m月d日 H时i分"}}</td>
                             <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n11 }}</a></td>
                             <td>{{ n12 | date:"Y年m月d日 H时i分"}}</td>
+                            <td>{{ n13 }}<td>
                         </tr>
                     {% endfor  %}
                   </tbody>
