@@ -270,6 +270,7 @@ class SendSample(models.Model):
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
     upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
     status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
@@ -290,6 +291,7 @@ class QualityCheck(models.Model):
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
     upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
     status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
@@ -307,6 +309,7 @@ class BuildLib(models.Model):
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
     upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
     status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
@@ -326,6 +329,7 @@ class UpMachine(models.Model):
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
     upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
     status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
@@ -346,6 +350,7 @@ class DownMachine(models.Model):
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
     upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
     status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
@@ -390,3 +395,17 @@ class CostInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'cost_info'
+
+
+class ReturnSample(models.Model):
+    sample_name = models.CharField(max_length=45)
+    sample_id = models.CharField(max_length=45)
+    location = models.CharField(max_length=100)
+    time = models.DateTimeField(blank=True, null=True)
+    upload_time = models.CharField(max_length=100, blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'return_sample'

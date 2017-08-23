@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content_header %}
+<h1>样品返样</h1>
+<ol class="breadcrumb">
+    <li><a href="{% url 'main' %}"><i class="fa fa-dashboard"></i>Home</a></li>
+    <li class="active">样品返样</li>
+</ol>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box">
+            <div class="box-header">
+                <h3 class="box-title" id="selected_proj">{{ select_proj }}</h3>
+                <!-- download button -->
+                <button type="submit" class="btn btn-default" title="上传返样结果" onclick="upload_project()">
+                  上传返样结果
+                </button>
+                </div>
+            <div class="box-body">
+                <table class="table table-responsive no-padding" id="return_sample">
+                  <thead>
+                    <tr>
+                        <th>样品名称</th>
+                        <th>样品编号</th>
+                        <th>所在地</th>
+                        <th>创建时间</th>
+                        <th>样品备注</th>
+                        <th>上传时间</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for n1,n2,n3,n4,n5,n6,n7,n8 in return_info %}
+                    <tr>
+                        <td>{{ n2 }}</td>
+                        <td>{{ n3 }}</td>
+                        <td>{{ n4 }}</td>
+                        <td>{{ n5 | date:"Y年m月d日 H时i分"}}</td>
+                        <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n7 }}</a></td>
+                        <td>{{ n6 }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+            <!-- recover_data -->
+            <div class="row">
+        <div class="col-xs-12">
+            <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">数据重置与删除</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body no-padding">
+              <table class="table table-bordered table-condensed">
+                    <thead>
+                        <tr><th>上传时间</th><th>操作</th></tr>
+                    </thead>
+                    <tbody>
+                      {% for n1,n2 in all_upload_times %}
+                          <tr>
+                              <td>{{ n1 }}</td>
+                              {% if n2 == 'N' %}
+                              <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">重置</button></td>
+                              {% else %}
+                              <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">删除</button></td>
+                              {% endif %}
+                          </tr>
+                      {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+      </div>
+        </div>
+        <!-- /.box -->
+    </div>
+</div>
+{% endblock %}
+
+{% load staticfiles %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-editable.css' %}">
+    <link rel="stylesheet" href="{% static 'css/fileinput.css' %}">
+{% endblock %}
+
+{% block page_script %}
+<script src="{% static 'js/bootstrap-editable.js' %}"></script>
+<script src="{% static 'js/xlsx.core.min.js' %}"></script>
+<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/ajaxfileupload.js' %}"></script>
+<script>
+    var username = "{{ username }}";
+    function upload_project() {
+      window.location.href = '/lims_app/upload_sample_info/?table=return_sample';
+    }
+    $(function(){
+        $('#return_sample').DataTable();
+        $('.username').editable({
+           url: '/lims_app/save_sample_info?table=return_sample',
+           type: 'text',
+           pk: 1,
+           name: this.id,
+           title: '添加备注',
+        });
+        $("#quality_check").addClass('active');
+    });
+
+    function recover_data(obj, upload_time, status) {
+      if(status == 'Y'){
+        action = 'delete';
+      }else{
+        action = 'recover';
+      }
+      ajaxSend('/lims_app/recover_data', {'upload_time': upload_time, 'table': 'return_sample', 'action': action},function(data){
+              alert(data.msg);
+              obj.parentNode.parentNode.remove();
+              window.location.href = "/lims_app/return_sample/";
+            })
+    }
+</script>
+{% endblock %}

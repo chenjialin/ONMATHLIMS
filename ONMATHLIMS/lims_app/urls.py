@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^build_lib/', views.build_lib, name='build_lib'),
     url(r'^upmachine/', views.upmachine, name='upmachine'),
     url(r'^downmachine/', views.downmachine, name='downmachine'),
+    url(r'^return_sample/', views.return_sample, name='return_sample'),
     url(r'^upload_sample_info/', views.upload_sample_info, name='upload_sample_info'),
     url(r'^save_sample_row/', views.save_sample_row, name='save_sample_row'),
     url(r'^save_sample_table/', views.save_sample_table, name='save_sample_tables'),
