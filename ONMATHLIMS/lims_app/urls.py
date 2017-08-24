@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^show_expense_detail/', views.show_expense_detail, name='show_expense_detail'),
     url(r'^download_expense_info/', views.down_expense_info, name='down_expense_info'),
     url(r'^manage_expense_info/', views.manage_expense_info, name='manage_expense_info'),
-    url(r'^recover_data/', views.recover_data, name='recover_data')
+    url(r'^recover_data/', views.recover_data, name='recover_data'),
+    url(r'^show_project_detail/', views.show_project_detail, name='show_project_detail'),
 ]

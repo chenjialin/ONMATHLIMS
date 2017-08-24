@@ -390,3 +390,14 @@ class CostInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'cost_info'
+
+
+class LogInfo(models.Model):
+    project_id = models.IntegerField()
+    action = models.CharField(max_length=45, blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    manager = models.CharField(max_length=45, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'project_log_table'

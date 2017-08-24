@@ -3,7 +3,7 @@
 import datetime
 from django.http import JsonResponse
 from django.db import connection
-from lims_app.models import SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, SampleProjectMaster
+from lims_app.models import SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, SampleProjectMaster, LogInfo
 
 
 def get_db_data(cmd, get_all=True):
@@ -62,7 +62,7 @@ def split_data(table, project_id, json_data):
     return insert_data, update_data
 
 
-def import_data(table, project_id, json_data):
+def import_data(table, project_id, json_data, username):
     project_number = SampleProjectMaster.objects.get(id=project_id).project_number
     if table == 'send_sample':
         if json_data[0].get('om_id'):
@@ -81,6 +81,7 @@ def import_data(table, project_id, json_data):
                                upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                                status='Y')
                 p.save()
+            LogInfo(project_id=project_id, action='更新了样品信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'更新成功!'})
         else:
             sample_type = get_sample_type(project_id)
@@ -106,6 +107,7 @@ def import_data(table, project_id, json_data):
                                upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                                status='Y')
                 p.save()
+            LogInfo(project_id=project_id, action='导入了样品信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
 
     elif table == 'quality_check':
@@ -130,8 +132,11 @@ def import_data(table, project_id, json_data):
                                  upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                                  status='Y')
                 p.save()
+            LogInfo(project_id=project_id, action='导入了质检信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
+            LogInfo(project_id=project_id, action='导入了样品信息表失败， 数据中存在非法om_id!',
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     elif table == 'build_lib':
         om_ids = [row_dict['om_id'] for row_dict in json_data]
@@ -152,8 +157,11 @@ def import_data(table, project_id, json_data):
                              upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                              status='Y')
                 p.save()
+            LogInfo(project_id=project_id, action='导入了建库信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
+            LogInfo(project_id=project_id, action='导入建库信息表失败， 数据中存在非法om_id!',
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     elif table == 'upmachine':
         om_ids = [row_dict['om_id'] for row_dict in json_data]
@@ -176,8 +184,11 @@ def import_data(table, project_id, json_data):
                               upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                               status='Y')
                 p.save()
+            LogInfo(project_id=project_id, action='导入了上机信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
+            LogInfo(project_id=project_id, action='导入上机信息表失败， 数据中存在非法om_id!',
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     elif table == 'downmachine':
         om_ids = [row_dict['om_id'] for row_dict in json_data]
@@ -200,14 +211,17 @@ def import_data(table, project_id, json_data):
                                 upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                                 status='Y')
                 p.save()
+            LogInfo(project_id=project_id, action='导入了下机信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
+            LogInfo(project_id=project_id, action='导入下机信息表失败， 数据中存在非法om_id!',
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'数据中存在非法om_id!'})
     else:
         return JsonResponse({'msg': 'error!'})
 
 
-def recover_data(project_id, table, upload_time, action):
+def recover_data(project_id, table, upload_time, action, username):
     '''
     recover data at most three times
     upload_time format: "%Y-%m-%d %H:%M"
@@ -219,55 +233,75 @@ def recover_data(project_id, table, upload_time, action):
             SendSample.objects.filter(project_id=project_id,
                                       upload_time=upload_time,
                                       status='N').update(status='Y')
+            LogInfo(project_id=project_id, action='重置了样品信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'重置成功!'})
         else:
             SendSample.objects.filter(project_id=project_id,
                                       upload_time=upload_time,
                                       status='Y').update(status='N')
+            LogInfo(project_id=project_id, action='重置了样品信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'删除成功!'})
     elif table == 'quality_check':
         if action == 'recover':
             QualityCheck.objects.filter(project_id=project_id,
                                         upload_time=upload_time,
                                         status='N').update(status='Y')
+            LogInfo(project_id=project_id, action='重置了质检信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'重置成功!'})
         else:
             QualityCheck.objects.filter(project_id=project_id,
                                         upload_time=upload_time,
                                         status='Y').update(status='N')
+            LogInfo(project_id=project_id, action='重置了质检信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'删除成功!'})
     elif table == 'build_lib':
         if action == 'recover':
             BuildLib.objects.filter(project_id=project_id,
                                     upload_time=upload_time,
                                     status='N').update(status='Y')
+            LogInfo(project_id=project_id, action='重置了建库信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'重置成功!'})
         else:
             BuildLib.objects.filter(project_id=project_id,
                                     upload_time=upload_time,
                                     status='Y').update(status='N')
+            LogInfo(project_id=project_id, action='重置了建库信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'删除成功!'})
     elif table == 'upmachine':
         if action == 'recover':
             UpMachine.objects.filter(project_id=project_id,
                                      upload_time=upload_time,
                                      status='N').update(status='Y')
+            LogInfo(project_id=project_id, action='重置了上机信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'重置成功!'})
         else:
             UpMachine.objects.filter(project_id=project_id,
                                      upload_time=upload_time,
                                      status='Y').update(status='N')
+            LogInfo(project_id=project_id, action='重置了上机信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'删除成功!'})
     elif table == 'downmachine':
         if action == 'recover':
             DownMachine.objects.filter(project_id=project_id,
                                        upload_time=upload_time,
                                        status='N').update(status='Y')
+            LogInfo(project_id=project_id, action='重置了下机信息表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'重置成功!'})
         else:
             DownMachine.objects.filter(project_id=project_id,
                                        upload_time=upload_time,
                                        status='Y').update(status='N')
+            LogInfo(project_id=project_id, action='重置了样品下机表到上传日期%s' % upload_time,
+                    time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'删除成功!'})
     else:
         return JsonResponse({'msg': 'error!'})
