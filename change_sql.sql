@@ -78,3 +78,27 @@ ALTER TABLE `SEQ_SA_INFO`.`upmachine`
 DROP INDEX `sample_id_UNIQUE` ;
 ALTER TABLE `SEQ_SA_INFO`.`downmachine`
 DROP INDEX `sample_id_UNIQUE` ;
+/* 2017-08-23
+*/
+CREATE TABLE `SEQ_SA_INFO`.`return_sample` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `sample_name` VARCHAR(45) NULL,
+  `sample_id` VARCHAR(45) NULL,
+  `location` VARCHAR(100) NULL,
+  `time` DATETIME NULL,
+  `upload_time` VARCHAR(45) NULL,
+  `comment` VARCHAR(100) NULL,
+  `status` VARCHAR(1) NULL,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `SEQ_SA_INFO`.`quality_check`
+ADD COLUMN `location` VARCHAR(100) NULL AFTER `upload_time`;
+
+ALTER TABLE `SEQ_SA_INFO`.`build_lib`
+ADD COLUMN `location` VARCHAR(100) NULL AFTER `upload_time`;
+
+ALTER TABLE `SEQ_SA_INFO`.`upmachine`
+ADD COLUMN `location` VARCHAR(100) NULL AFTER `upload_time`;
+
+ALTER TABLE `SEQ_SA_INFO`.`downmachine`
+ADD COLUMN `location` VARCHAR(100) NULL AFTER `upload_time`;

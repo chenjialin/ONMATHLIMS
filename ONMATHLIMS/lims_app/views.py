@@ -228,6 +228,19 @@ def downmachine(request):
                      'all_attachment': all_attachment, 'all_upload_times': all_upload_times})
 
 
+@login_required
+def return_sample(request):
+    username = request.session.get('username', '')
+    if 'search' in request.GET.keys() or 'q' in request.GET.keys():
+        key_word = request.GET.get('q')
+        return redirect('/lims_app/search?q=%s' % key_word)
+
+    return_info = get_sample_info.get_return_sample()
+    all_upload_times = get_sample_info.get_upload_time(project_id='', name='return_sample')
+    return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'return_sample.html'),
+                  {'username': username, 'return_info': return_info, 'all_upload_times': all_upload_times})
+
+
 def save_sample_info(request):
     table_name = request.GET.get('table')
     sample_id = request.POST['name']
@@ -242,7 +255,8 @@ def save_sample_info(request):
         UpMachine.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
     elif table_name == 'downmachine':
         DownMachine.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
-
+    elif table_name == 'return_sample':
+        ReturnSample.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
     return JsonResponse({'msg': 'ok'})
 
 
@@ -279,12 +293,12 @@ def down_sample_info(request):
 @login_required
 def upload_sample_info(request):
     title = {'quality_check': u'质检', 'send_sample': u'送样', 'build_lib': u'建库',
-             'upmachine': u'上机', 'downmachine': u'下机'}
+             'upmachine': u'上机', 'downmachine': u'下机', 'return_sample': u'返样'}
 
     username = request.COOKIES.get('username', '')
     table_name = request.GET.get('table', '')
     project_id = request.GET.get('project_id', '')
-    if table_name and project_id:
+    if table_name or project_id:
         return render(request,  os.path.join(CODE_ROOT, 'lims_app/templates', 'upload.html'),
                         {'username': username, 'table': table_name, 'table_name': title[table_name], 'project_id': project_id})
 
@@ -298,9 +312,13 @@ def save_sample_table(request):
     username = request.session.get('username', '')
     json_data = request.POST['sample_table_data']
     json_data = json.loads(json_data)
-    project_id = request.POST['project_id']
+    project_id = request.POST.get('project_id', '')
     table_name = request.POST['table']
-    response = check_sample.import_data(table_name, project_id, json_data, username)
+
+    if table_name == 'return_sample':
+        response = check_sample.import_return_sample(json_data)
+    else:
+        response = check_sample.import_data(table_name, project_id, json_data, username)
     return response
 
 

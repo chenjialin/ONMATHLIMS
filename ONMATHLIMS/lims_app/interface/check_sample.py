@@ -3,7 +3,8 @@
 import datetime
 from django.http import JsonResponse
 from django.db import connection
-from lims_app.models import SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, SampleProjectMaster, LogInfo
+from lims_app.models import SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, SampleProjectMaster,ReturnSample, LogInfo
+from ..import DbObjectDoesNotExist
 
 
 def get_db_data(cmd, get_all=True):
@@ -221,7 +222,7 @@ def import_data(table, project_id, json_data, username):
         return JsonResponse({'msg': 'error!'})
 
 
-def recover_data(project_id, table, upload_time, action, username):
+def recover_data(table, upload_time, action, username, project_id=''):
     '''
     recover data at most three times
     upload_time format: "%Y-%m-%d %H:%M"
@@ -303,5 +304,74 @@ def recover_data(project_id, table, upload_time, action, username):
             LogInfo(project_id=project_id, action='重置了样品下机表到上传日期%s' % upload_time,
                     time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'删除成功!'})
+    elif table == 'return_sample':
+        if action == 'recover':
+            ReturnSample.objects.filter(upload_time=upload_time,
+                                        status='N').update(status='Y')
+            # get_location()
+            return JsonResponse({'msg': u'重置成功!'})
+        else:
+            ReturnSample.objects.filter(upload_time=upload_time,
+                                        status='Y').update(status='N')
+            # get_location()
+            return JsonResponse({'msg': u'删除成功!'})
     else:
         return JsonResponse({'msg': 'error!'})
+
+
+def split_return_sample(json_data):
+    cmd = "select om_id from %s where project_id='%s'" % (table, project_id)
+    results = get_db_data(cmd)
+    om_ids = []
+    for row_dict in json_data:
+        om_ids.append(row_dict['om_id'])
+    old_id_set = set([result[0] for result in results])
+    new_id_set = set(om_ids)
+    insert_id = list(new_id_set.difference(old_id_set))
+    insert_data = []
+    update_data = []
+    for row_dict in json_data:
+        if row_dict['om_id'] in insert_id:
+            insert_data.append(row_dict)
+        else:
+            update_data.append(row_dict)
+
+    return insert_data, update_data
+
+
+def get_location():
+    cmd = "select sample_id,location from return_sample where status = 'Y'"
+    results = get_db_data(cmd)
+    for sample_id, location in results:
+        try:
+            QualityCheck.objects.filter(sample_id=sample_id, status='Y').update(location=location)
+            BuildLib.objects.filter(sample_id=sample_id, status='Y').update(location=location)
+            UpMachine.objects.filter(sample_id=sample_id, status='Y').update(location=location)
+            DownMachine.objects.filter(sample_id=sample_id, status='Y').update(location=location)
+        except DbObjectDoesNotExist:
+            pass
+
+
+def import_return_sample(json_data):
+    cmd = "select sample_id from return_sample where status = 'Y'"
+    results = get_db_data(cmd)
+    sample_ids = [row_dict['sample_id'] for row_dict in results]
+    old_id_set = set([result[0] for result in results])
+    new_id_set = set(sample_ids)
+    insert_id = list(new_id_set.difference(old_id_set))
+
+    for row_dict in json_data:
+        if row_dict['sample_id'] not in insert_id:
+            ReturnSample.objects.filter(sample_id=row_dict['sample_id']).update(status='N')
+
+        p = ReturnSample(sample_name=row_dict['sample_name'],
+                         sample_id=row_dict['sample_id'],
+                         location=row_dict['location'],
+                         time=row_dict['time'],
+                         upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                         comment=row_dict['comment'],
+                         status='Y')
+        p.save()
+
+    get_location()
+    return JsonResponse({'msg': u'导入成功!'})
