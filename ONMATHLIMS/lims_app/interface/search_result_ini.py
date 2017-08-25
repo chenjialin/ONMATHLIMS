@@ -21,23 +21,30 @@ def get_search_result(search_key):
     """
 
     sql2 = """select
-              ss.project_number as '项目编号',
-              ss.sample_name as '样品名称',
-              ss.species as '物种',
-              qc.sample_id as '样品编号',
-              qc.results as '判定结果',
-              um.data_count as '上机数据量'
+              ss.project_number,
+              ss.sample_name,
+              ss.om_id,
+              ss.species,
+              ss.status as ss_st,
+              qc.sample_id,
+              qc.results,
+              qc.status as qc_st,
+              um.data_count,
+              um.status as um_st
               from send_sample ss
-              left join quality_check qc on ss.sample_name=qc.sample_name
-              left join upmachine um on um.sample_name=ss.sample_name
-    """
-    condition = " where ss.project_number='{key}' or ss.sample_name='{key}' \
-                or ss.species='{key}' or qc.sample_id='{key}'"
+              left join quality_check qc on ss.om_id=qc.om_id
+              left join upmachine um on um.om_id=ss.om_id
+           """
+    condition = " where ss.project_number='{key}' or ss.sample_name='{key}' or ss.species='{key}' or qc.sample_id='{key}'"
     sql2 += condition.format(key=search_key)
     cursor.execute(sql2)
     results = cursor.fetchall()
+    out_results = []
+    for result in results:
+        if result[2] and result[4] != 'N' and result[7] != 'N' and result[9] != 'N':
+            out_results.append(result)
 
-    table_header = ['项目编号', '样品名称', '物种', '样品编号', '判定结果', '上机数据量']
-    table_values = results
+    table_header = ['项目编号', '样品名称', 'OMID', '物种', '样品编号', '判定结果', '上机数据量']
+    table_values = out_results
 
     return table_header, table_values
