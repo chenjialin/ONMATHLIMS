@@ -41,7 +41,7 @@ def get_sample_by_project(project_id, name):
     :return:
     where project_id='%s'
     """
-    cmd = "select * from %s where project_id='%s'" % (name, project_id)
+    cmd = "select * from %s where project_id='%s' and status='Y'" % (name, project_id)
 
     cursor = connection.cursor()
     cursor.execute(cmd)
@@ -57,3 +57,25 @@ def get_user_id_by_name(username):
     result = cursor.fetchone()
 
     return result[0] if result else 0
+
+
+def get_upload_time(project_id, name):
+    if name == 'return_sample':
+        cmd = "select distinct upload_time,status from %s order by upload_time desc" % (name)
+    else:
+        cmd = "select distinct upload_time,status from %s where project_id='%s' order by upload_time desc" % (name, project_id)
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    results = cursor.fetchall()
+
+    return results
+
+
+def get_return_sample():
+    cmd = "select * from return_sample where status='Y'"
+
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    results = cursor.fetchall()
+
+    return results

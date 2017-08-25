@@ -8,9 +8,10 @@ function pageInit(){
       datatype : 'local',
       height: 500,
       // height: 'auto',
-      colNames: ['样品名称', '样品编号', '文库编号', '时间', '备注'],
+      colNames: ['样品名称', 'OMID', '样品编号', '文库编号', '时间', '备注'],
       colModel: [
             { name: 'sample_name', index: 'sample_name', editable: true, width: 60},
+            { name: 'om_id', index: 'om_id', editable: true, width: 60},
             { name: 'sample_id', index: 'sample_id', editable: true, width: 60},
             { name: 'lib_id', index: 'lib_id', editable: true, width: 60},
             { name: 'time', index: 'time', editable: true, width: 60},

@@ -39,6 +39,8 @@
                       <a href="{% static "download/downmachine.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% elif table == 'send_sample' %}
                       <a href="{% static "download/send_sample.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
+                  {% elif table == 'return_sample' %}
+                      <a href="{% static "download/return_sample.xlsx" %}" style="font-size: smaller ">点击下载模板</a>
                   {% endif %}
                   <input type="file" accept=" application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" id="upload_excel" />
                 </span>
@@ -56,7 +58,6 @@
             <div class="box-body table-responsive no-padding">
               <table id="table" class="table table-hover"></table>
               <button type="submit" class="btn btn-default" id="insert">导入数据</button>
-              <button type="submit" class="btn btn-default" id="update">更新数据</button>
             </div>
             <!-- /.box-body -->
         </div>
@@ -80,6 +81,8 @@
     <script src="{% static 'js/downmachine.js' %}"></script>
   {% elif table == 'send_sample' %}
     <script src="{% static 'js/send_sample.js' %}"></script>
+  {% elif table == 'return_sample' %}
+    <script src="{% static 'js/return_sample.js' %}"></script>
   {% endif %}
   <script>
   /*
@@ -88,7 +91,7 @@
           $("#receive_sample").addClass("active");
       });
   */
-  var project_id = {{ project_id }};
+  var project_id = "{{ project_id }}";
   var table = "{{ table }}";
 
   var table_map  =  {'样品编号':'sample_id',
@@ -108,7 +111,9 @@
                      'q20': 'q20',
                      'q30': 'q30',
                      '时间': 'time',
-                     '备注': 'comment'}
+                     '备注': 'comment',
+                     'OMID': 'om_id',
+                     '所在地': 'location'}
 
   function save_sample_table() {
     var ids = $("#table").getDataIDs();
@@ -161,27 +166,36 @@
     var status = confirm("确认导入数据?");
     if (status) {
       var sample_table_data = $("#table").getRowData();
-      var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id, 'action': 'insert', 'table': table}
+      var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id, 'table': table}
       ajaxSend('/lims_app/save_sample_table/', params , function (data) {
           alert(data.msg);
           window.location.href="/lims_app/upload_sample_info?table={{table}}&project_id={{project_id}}";
         }, 'POST');
       }
     });
-
     $("#update").unbind().bind('click', function () {
       save_sample_table();
       var status = confirm("确认更新数据?");
       if (status) {
         var sample_table_data = $("#table").getRowData();
-        var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id, 'action': 'update', 'table': table}
+        var params = {'sample_table_data': JSON.stringify(sample_table_data), 'project_id': project_id, 'table': table}
         ajaxSend('/lims_app/save_sample_table/', params , function (data) {
             alert(data.msg);
             window.location.href="/lims_app/upload_sample_info?table={{table}}&project_id={{project_id}}";
           }, 'POST');
         }
       });
-
+  function check_unique(arr){
+    var n = [];
+    for(var i = 0; i < arr.length; i++){
+      if(n.indexOf(arr[i]) == -1) n.push(arr[i])
+    }
+    if(n.length != arr.length){
+      alert('上传数据 omid 存在重复!');
+      window.location.href = 'lims_app/upload_sample_info/?table={{table}}&proejct_id={{project_id}}';
+    }
+    return;
+  }
   function handleFile(e) {
         var files = e.target.files;
         var i,f;
@@ -209,15 +223,20 @@
                     }
                 });
         var transform_json=[];
+        var om_array = [];
                 $.each(result,function (i,val) {
           var temp_obj={};
           for(value in table_map){
             if(val[value]){
+              if(value == 'OMID'){
+                om_array.push(val[value]);
+              }
               temp_obj[table_map[value]] = val[value];
             }
           }
           transform_json.push(temp_obj);
                 })
+        check_unique(om_array);  // check omid whether repeat
         for(var i=0;i<=transform_json.length;i++){
           $("#table").addRowData(i+1,transform_json[i]);
         };

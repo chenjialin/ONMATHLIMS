@@ -63,7 +63,7 @@ CREATE TABLE `attachment` (
   `status` varchar(45) DEFAULT NULL,
   `upload_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -72,7 +72,7 @@ CREATE TABLE `attachment` (
 
 LOCK TABLES `attachment` WRITE;
 /*!40000 ALTER TABLE `attachment` DISABLE KEYS */;
-INSERT INTO `attachment` VALUES (4,21,5,5,'send_sample','send_sample.xlsx','lims_app/static/attachment/21/send_sample/send_sample.xlsx','new','2017-08-02 00:01:21'),(5,21,5,5,'quality_check','ONMATH-900送样结果.xls','lims_app/static/attachment/21/quality_check/ONMATH-900送样结果.xls','new','2017-08-02 19:14:42'),(6,12,5,5,'quality_check','ONMATH-900送样结果.xls','lims_app/static/attachment/12/quality_check/ONMATH-900送样结果.xls','new','2017-08-03 17:41:36');
+INSERT INTO `attachment` VALUES (4,21,5,5,'send_sample','send_sample.xlsx','lims_app/static/attachment/21/send_sample/send_sample.xlsx','new','2017-08-02 00:01:21'),(5,21,5,5,'quality_check','ONMATH-900送样结果.xls','lims_app/static/attachment/21/quality_check/ONMATH-900送样结果.xls','new','2017-08-02 19:14:42'),(6,12,5,5,'quality_check','ONMATH-900送样结果.xls','lims_app/static/attachment/12/quality_check/ONMATH-900送样结果.xls','new','2017-08-03 17:41:36'),(7,12,5,5,'send_sample','upmachine.csv','lims_app/static/attachment/12/send_sample/upmachine.csv','new','2017-08-21 09:57:04');
 /*!40000 ALTER TABLE `attachment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -246,6 +246,35 @@ LOCK TABLES `auth_user_user_permissions` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `billing_info`
+--
+
+DROP TABLE IF EXISTS `billing_info`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `billing_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) DEFAULT NULL,
+  `project_number` varchar(45) DEFAULT NULL,
+  `expense` int(11) DEFAULT NULL,
+  `billing_number` varchar(45) DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `comment` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `billing_info`
+--
+
+LOCK TABLES `billing_info` WRITE;
+/*!40000 ALTER TABLE `billing_info` DISABLE KEYS */;
+INSERT INTO `billing_info` VALUES (1,21,'ONMATH-909',2000,'2134143','2017-08-17 02:42:10','haha'),(4,21,'ONMATH-909',1000,'2134123','2017-08-17 03:11:03','TEST');
+/*!40000 ALTER TABLE `billing_info` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `build_lib`
 --
 
@@ -257,12 +286,15 @@ CREATE TABLE `build_lib` (
   `project_id` int(11) DEFAULT NULL,
   `project_number` varchar(45) DEFAULT NULL,
   `sample_name` varchar(45) DEFAULT NULL,
+  `om_id` varchar(100) DEFAULT NULL,
   `sample_id` varchar(45) DEFAULT NULL,
   `lib_id` varchar(45) DEFAULT NULL,
-  `time` varchar(45) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
   `comment` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sample_id_UNIQUE` (`sample_name`)
+  `upload_time` varchar(45) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `status` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -272,7 +304,7 @@ CREATE TABLE `build_lib` (
 
 LOCK TABLES `build_lib` WRITE;
 /*!40000 ALTER TABLE `build_lib` DISABLE KEYS */;
-INSERT INTO `build_lib` VALUES (1,12,'ONMATH-900','sample_name_1','10-A','lib_id_1','2017/6/29',''),(2,12,'ONMATH-900','sample_name_2','10-B','lib_id_2','2017/6/29',''),(3,12,'ONMATH-900','sample_name_3','11-A','lib_id_3','2017/6/29',''),(4,12,'ONMATH-900','sample_name_4','11-B','','2017/6/29',''),(5,12,'ONMATH-900','sample_name_5','12-A','lib_id_5','2017/6/29',''),(6,12,'ONMATH-900','sample_name_6','12-B','lib_id_6','2017/6/29',''),(7,12,'ONMATH-900','sample_name_7','13-A','','2017/6/29',''),(8,12,'ONMATH-900','sample_name_8','13-B','lib_id_8','2017/6/29',''),(9,12,'ONMATH-900','sample_name_9','14-A','lib_id_9','2017/6/29','haha'),(10,12,'ONMATH-900','sample_name_10','14-B','lib_id_10','2017/6/29',''),(11,14,'ONMATH-903','test_1','15-A','','2017/7/3',''),(12,14,'ONMATH-903','test_2','15-B','lib_id_12','2017/7/3',''),(13,14,'ONMATH-903','test_3','16-A','lib_id_13','2017/7/3',''),(14,14,'ONMATH-903','test_4','16-B','lib_id_14','2017/7/3',''),(15,14,'ONMATH-903','test_5','17-A','lib_id_15','2017/7/3',''),(16,14,'ONMATH-903','test_6','17-B','lib_id_16','2017/7/3',''),(17,14,'ONMATH-903','test_7','18-A','lib_id_17','2017/7/3',''),(18,14,'ONMATH-903','test_8','18-B','lib_id_18','2017/7/3',''),(19,14,'ONMATH-903','test_9','19-A','lib_id_19','2017/7/3','haha'),(20,14,'ONMATH-903','test_10','19-B','','2017/7/23',''),(21,21,'ONMATH-909','haha_1','20-A','lib_id_21','2017/7/23',''),(22,21,'ONMATH-909','haha_2','20-B','lib_id_22','2017/7/23',''),(23,21,'ONMATH-909','haha_3','21-A','lib_id_23','2017/7/23',''),(24,21,'ONMATH-909','haha_4','21-B','lib_id_24','2017/7/23',''),(25,21,'ONMATH-909','haha_5','22-A','lib_id_25','2017/7/23',''),(26,21,'ONMATH-909','haha_6','22-B','lib_id_26','2017/7/23',''),(27,21,'ONMATH-909','haha_7','123-A','lib_id_27','2017/7/23',''),(28,21,'ONMATH-909','haha_8','123-B','','2017/7/23','haha'),(29,21,'ONMATH-909','haha_9','131-A','lib_id_29','2017/7/23',''),(30,21,'ONMATH-909','haha_10','131-B','lib_id_30','2017/7/23','');
+INSERT INTO `build_lib` VALUES (1,12,'ONMATH-900','sample_name_1',NULL,'10-A','lib_id_1','2017-06-29 00:00:00','',NULL,NULL,NULL),(2,12,'ONMATH-900','sample_name_2',NULL,'10-B','lib_id_2','2017-06-29 00:00:00','',NULL,NULL,NULL),(3,12,'ONMATH-900','sample_name_3',NULL,'11-A','lib_id_3','2017-06-29 00:00:00','',NULL,NULL,NULL),(4,12,'ONMATH-900','sample_name_4',NULL,'11-B','','2017-06-29 00:00:00','',NULL,NULL,NULL),(5,12,'ONMATH-900','sample_name_5',NULL,'12-A','lib_id_5','2017-06-29 00:00:00','',NULL,NULL,NULL),(6,12,'ONMATH-900','sample_name_6',NULL,'12-B','lib_id_6','2017-06-29 00:00:00','',NULL,NULL,NULL),(7,12,'ONMATH-900','sample_name_7',NULL,'13-A','','2017-06-29 00:00:00','',NULL,NULL,NULL),(8,12,'ONMATH-900','sample_name_8',NULL,'13-B','lib_id_8','2017-06-29 00:00:00','',NULL,NULL,NULL),(9,12,'ONMATH-900','sample_name_9',NULL,'14-A','lib_id_9','2017-06-29 00:00:00','haha',NULL,NULL,NULL),(10,12,'ONMATH-900','sample_name_10',NULL,'14-B','lib_id_10','2017-06-29 00:00:00','',NULL,NULL,NULL),(11,14,'ONMATH-903','test_1',NULL,'15-A','','2017-07-03 00:00:00','',NULL,NULL,NULL),(12,14,'ONMATH-903','test_2',NULL,'15-B','lib_id_12','2017-07-03 00:00:00','',NULL,NULL,NULL),(13,14,'ONMATH-903','test_3',NULL,'16-A','lib_id_13','2017-07-03 00:00:00','',NULL,NULL,NULL),(14,14,'ONMATH-903','test_4',NULL,'16-B','lib_id_14','2017-07-03 00:00:00','',NULL,NULL,NULL),(15,14,'ONMATH-903','test_5',NULL,'17-A','lib_id_15','2017-07-03 00:00:00','',NULL,NULL,NULL),(16,14,'ONMATH-903','test_6',NULL,'17-B','lib_id_16','2017-07-03 00:00:00','',NULL,NULL,NULL),(17,14,'ONMATH-903','test_7',NULL,'18-A','lib_id_17','2017-07-03 00:00:00','',NULL,NULL,NULL),(18,14,'ONMATH-903','test_8',NULL,'18-B','lib_id_18','2017-07-03 00:00:00','',NULL,NULL,NULL),(19,14,'ONMATH-903','test_9',NULL,'19-A','lib_id_19','2017-07-03 00:00:00','haha',NULL,NULL,NULL),(20,14,'ONMATH-903','test_10',NULL,'19-B','','2017-07-23 00:00:00','',NULL,NULL,NULL),(21,21,'ONMATH-909','haha_1',NULL,'20-A','lib_id_21','2017-07-23 00:00:00','',NULL,NULL,NULL),(22,21,'ONMATH-909','haha_2',NULL,'20-B','lib_id_22','2017-07-23 00:00:00','',NULL,NULL,NULL),(23,21,'ONMATH-909','haha_3',NULL,'21-A','lib_id_23','2017-07-23 00:00:00','',NULL,NULL,NULL),(24,21,'ONMATH-909','haha_4',NULL,'21-B','lib_id_24','2017-07-23 00:00:00','',NULL,NULL,NULL),(25,21,'ONMATH-909','haha_5',NULL,'22-A','lib_id_25','2017-07-23 00:00:00','',NULL,NULL,NULL),(26,21,'ONMATH-909','haha_6',NULL,'22-B','lib_id_26','2017-07-23 00:00:00','',NULL,NULL,NULL),(27,21,'ONMATH-909','haha_7',NULL,'123-A','lib_id_27','2017-07-23 00:00:00','',NULL,NULL,NULL),(28,21,'ONMATH-909','haha_8',NULL,'123-B','','2017-07-23 00:00:00','haha',NULL,NULL,NULL),(29,21,'ONMATH-909','haha_9',NULL,'131-A','lib_id_29','2017-07-23 00:00:00','',NULL,NULL,NULL),(30,21,'ONMATH-909','haha_10',NULL,'131-B','lib_id_30','2017-07-23 00:00:00','',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `build_lib` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -302,6 +334,36 @@ LOCK TABLES `compare_table` WRITE;
 /*!40000 ALTER TABLE `compare_table` DISABLE KEYS */;
 INSERT INTO `compare_table` VALUES (4,2,'1','a vs b','',''),(5,2,'2','a vs c','',''),(6,2,'3','b vs c','',''),(99,1,'1','a vs c','a','c'),(100,1,'2','a vs d','a','d'),(101,1,'3','a vs f','a','f'),(102,1,'4','a vs g','a','g'),(103,1,'5','a vs t','a','t'),(104,1,'6','a vs u','a','u'),(105,1,'8','c vs f','c','f'),(106,1,'9','c vs g','c','g'),(107,1,'10','c vs t','c','t'),(108,1,'11','c vs u','c','u'),(109,1,'12','d vs f','d','f'),(110,1,'15','d vs u','d','u'),(111,1,'17','f vs t','f','t'),(112,1,'18','f vs u','f','u'),(113,1,'19','g vs t','g','t'),(114,1,'20','g vs u','g','u'),(115,1,'21','t vs u','t','u');
 /*!40000 ALTER TABLE `compare_table` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `cost_info`
+--
+
+DROP TABLE IF EXISTS `cost_info`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cost_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) DEFAULT NULL,
+  `project_number` varchar(45) DEFAULT NULL,
+  `expense` int(11) DEFAULT NULL,
+  `sample_number` varchar(45) DEFAULT NULL,
+  `unit_cost` varchar(45) DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `comment` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cost_info`
+--
+
+LOCK TABLES `cost_info` WRITE;
+/*!40000 ALTER TABLE `cost_info` DISABLE KEYS */;
+INSERT INTO `cost_info` VALUES (1,21,'ONMATH-909',1000,'12','10','2017-08-17 02:57:45','add more sample'),(2,21,'ONMATH-909',1000,'20','500','2017-08-14 00:00:00',NULL),(3,21,'ONMATH-909',1200,'12','100','2017-08-17 02:59:00','test');
+/*!40000 ALTER TABLE `cost_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -411,6 +473,7 @@ CREATE TABLE `django_session` (
 
 LOCK TABLES `django_session` WRITE;
 /*!40000 ALTER TABLE `django_session` DISABLE KEYS */;
+INSERT INTO `django_session` VALUES ('hmwj1gg2dly5ouswz7hamagw3cxlyh2z','YjRiNzk3YzU5ZmUyNzBiOGU0Y2QzYTU1ZDdmN2NhMTkyYzlmMDZiYTp7InVzZXJuYW1lIjoibXl0ZXN0In0=','2017-08-24 09:24:43.112568'),('lzav3k7k878cky5z2paquathla8scpwg','YjRiNzk3YzU5ZmUyNzBiOGU0Y2QzYTU1ZDdmN2NhMTkyYzlmMDZiYTp7InVzZXJuYW1lIjoibXl0ZXN0In0=','2017-09-07 09:29:08.764416'),('pqt3hmpvztgig93do4l1nprly8inu9pd','YjRiNzk3YzU5ZmUyNzBiOGU0Y2QzYTU1ZDdmN2NhMTkyYzlmMDZiYTp7InVzZXJuYW1lIjoibXl0ZXN0In0=','2017-08-31 01:20:13.285016');
 /*!40000 ALTER TABLE `django_session` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -467,14 +530,17 @@ CREATE TABLE `downmachine` (
   `project_id` varchar(45) DEFAULT NULL,
   `project_number` varchar(45) DEFAULT NULL,
   `sample_name` varchar(45) DEFAULT NULL,
+  `om_id` varchar(100) DEFAULT NULL,
   `sample_id` varchar(45) DEFAULT NULL,
   `data_count` varchar(45) DEFAULT NULL,
   `q20` varchar(45) DEFAULT NULL,
   `q30` varchar(45) DEFAULT NULL,
-  `time` varchar(45) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
   `comment` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sample_id_UNIQUE` (`sample_id`)
+  `upload_time` varchar(45) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `status` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -484,7 +550,7 @@ CREATE TABLE `downmachine` (
 
 LOCK TABLES `downmachine` WRITE;
 /*!40000 ALTER TABLE `downmachine` DISABLE KEYS */;
-INSERT INTO `downmachine` VALUES (1,'12','ONMATH-900','sample_name_1','10-A','4','23','23','2017/7/2',''),(2,'12','ONMATH-900','sample_name_2','10-B','3','22','','2017/7/2',''),(3,'12','ONMATH-900','sample_name_3','11-A','4','22','','2017/7/2',''),(4,'12','ONMATH-900','sample_name_4','11-B','3','32','32','2017/7/2','test'),(5,'12','ONMATH-900','sample_name_5','12-A','3','22','','2017/7/2',''),(6,'12','ONMATH-900','sample_name_6','12-B','','','','2017/7/2',''),(7,'12','ONMATH-900','sample_name_7','13-A','4','32','','2017/7/2',''),(8,'12','ONMATH-900','sample_name_8','13-B','','','','2017/7/2',''),(9,'12','ONMATH-900','sample_name_9','14-A','2','32','','2017/7/2',''),(10,'12','ONMATH-900','sample_name_10','14-B','','','','2017/7/2','test'),(11,'14','ONMATH-903','test_1','15-A','2','','','2017/7/8',''),(12,'14','ONMATH-903','test_2','15-B','2','','2','2017/7/8',''),(13,'14','ONMATH-903','test_3','16-A','2','','','2017/7/8',''),(14,'14','ONMATH-903','test_4','16-B','2','','','2017/7/8',''),(15,'14','ONMATH-903','test_5','17-A','2','','','2017/7/8',''),(16,'14','ONMATH-903','test_6','17-B','2','','32','2017/7/8',''),(17,'14','ONMATH-903','test_7','18-A','2','','','2017/7/8',''),(18,'14','ONMATH-903','test_8','18-B','2','','','2017/7/8',''),(19,'14','ONMATH-903','test_9','19-A','2','','','2017/7/8',''),(20,'14','ONMATH-903','test_10','19-B','2','','','2017/7/30',''),(21,'21','ONMATH-909','haha_1','20-A','','','32','2017/7/30',''),(22,'21','ONMATH-909','haha_2','20-B','','','','2017/7/30','test'),(23,'21','ONMATH-909','haha_3','21-A','','','','2017/7/30',''),(24,'21','ONMATH-909','haha_4','21-B','6','','','2017/7/30',''),(25,'21','ONMATH-909','haha_5','22-A','','','32','2017/7/30',''),(26,'21','ONMATH-909','haha_6','22-B','','','32','2017/7/30',''),(27,'21','ONMATH-909','haha_7','123-A','4','','','2017/7/30',''),(28,'21','ONMATH-909','haha_8','123-B','','','','2017/7/30',''),(29,'21','ONMATH-909','haha_9','131-A','','','','2017/7/30',''),(30,'21','ONMATH-909','haha_10','131-B','','','','2017/7/30','');
+INSERT INTO `downmachine` VALUES (1,'12','ONMATH-900','sample_name_1',NULL,'10-A','4','23','23','2017-07-02 00:00:00','',NULL,NULL,NULL),(2,'12','ONMATH-900','sample_name_2',NULL,'10-B','3','22','','2017-07-02 00:00:00','',NULL,NULL,NULL),(3,'12','ONMATH-900','sample_name_3',NULL,'11-A','4','22','','2017-07-02 00:00:00','',NULL,NULL,NULL),(4,'12','ONMATH-900','sample_name_4',NULL,'11-B','3','32','32','2017-07-02 00:00:00','test',NULL,NULL,NULL),(5,'12','ONMATH-900','sample_name_5',NULL,'12-A','3','22','','2017-07-02 00:00:00','',NULL,NULL,NULL),(6,'12','ONMATH-900','sample_name_6',NULL,'12-B','','','','2017-07-02 00:00:00','',NULL,NULL,NULL),(7,'12','ONMATH-900','sample_name_7',NULL,'13-A','4','32','','2017-07-02 00:00:00','',NULL,NULL,NULL),(8,'12','ONMATH-900','sample_name_8',NULL,'13-B','','','','2017-07-02 00:00:00','',NULL,NULL,NULL),(9,'12','ONMATH-900','sample_name_9',NULL,'14-A','2','32','','2017-07-02 00:00:00','',NULL,NULL,NULL),(10,'12','ONMATH-900','sample_name_10',NULL,'14-B','','','','2017-07-02 00:00:00','test',NULL,NULL,NULL),(11,'14','ONMATH-903','test_1',NULL,'15-A','2','','','2017-07-08 00:00:00','',NULL,NULL,NULL),(12,'14','ONMATH-903','test_2',NULL,'15-B','2','','2','2017-07-08 00:00:00','',NULL,NULL,NULL),(13,'14','ONMATH-903','test_3',NULL,'16-A','2','','','2017-07-08 00:00:00','',NULL,NULL,NULL),(14,'14','ONMATH-903','test_4',NULL,'16-B','2','','','2017-07-08 00:00:00','',NULL,NULL,NULL),(15,'14','ONMATH-903','test_5',NULL,'17-A','2','','','2017-07-08 00:00:00','',NULL,NULL,NULL),(16,'14','ONMATH-903','test_6',NULL,'17-B','2','','32','2017-07-08 00:00:00','',NULL,NULL,NULL),(17,'14','ONMATH-903','test_7',NULL,'18-A','2','','','2017-07-08 00:00:00','',NULL,NULL,NULL),(18,'14','ONMATH-903','test_8',NULL,'18-B','2','','','2017-07-08 00:00:00','',NULL,NULL,NULL),(19,'14','ONMATH-903','test_9',NULL,'19-A','2','','','2017-07-08 00:00:00','',NULL,NULL,NULL),(20,'14','ONMATH-903','test_10',NULL,'19-B','2','','','2017-07-30 00:00:00','',NULL,NULL,NULL),(21,'21','ONMATH-909','haha_1',NULL,'20-A','','','32','2017-07-30 00:00:00','',NULL,NULL,NULL),(22,'21','ONMATH-909','haha_2',NULL,'20-B','','','','2017-07-30 00:00:00','test',NULL,NULL,NULL),(23,'21','ONMATH-909','haha_3',NULL,'21-A','','','','2017-07-30 00:00:00','',NULL,NULL,NULL),(24,'21','ONMATH-909','haha_4',NULL,'21-B','6','','','2017-07-30 00:00:00','',NULL,NULL,NULL),(25,'21','ONMATH-909','haha_5',NULL,'22-A','','','32','2017-07-30 00:00:00','',NULL,NULL,NULL),(26,'21','ONMATH-909','haha_6',NULL,'22-B','','','32','2017-07-30 00:00:00','',NULL,NULL,NULL),(27,'21','ONMATH-909','haha_7',NULL,'123-A','4','','','2017-07-30 00:00:00','',NULL,NULL,NULL),(28,'21','ONMATH-909','haha_8',NULL,'123-B','','','','2017-07-30 00:00:00','',NULL,NULL,NULL),(29,'21','ONMATH-909','haha_9',NULL,'131-A','','','','2017-07-30 00:00:00','',NULL,NULL,NULL),(30,'21','ONMATH-909','haha_10',NULL,'131-B','','','','2017-07-30 00:00:00','',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `downmachine` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -566,16 +632,19 @@ CREATE TABLE `quality_check` (
   `project_id` int(11) DEFAULT NULL,
   `project_number` varchar(45) DEFAULT NULL,
   `sample_name` varchar(45) DEFAULT NULL,
+  `om_id` varchar(100) DEFAULT NULL,
   `sample_id` varchar(45) DEFAULT NULL,
   `concentration` varchar(45) DEFAULT NULL,
   `volume` varchar(45) DEFAULT NULL,
   `rin` varchar(45) DEFAULT NULL,
   `results` varchar(45) DEFAULT NULL,
-  `time` varchar(45) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
   `comment` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sample_id_UNIQUE` (`sample_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8;
+  `upload_time` varchar(45) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `status` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -584,8 +653,36 @@ CREATE TABLE `quality_check` (
 
 LOCK TABLES `quality_check` WRITE;
 /*!40000 ALTER TABLE `quality_check` DISABLE KEYS */;
-INSERT INTO `quality_check` VALUES (1,12,'ONMATH-900','sample_name_1','10-A','11','3','','A','2017/6/28',''),(2,12,'ONMATH-900','sample_name_2','10-B','','','','A','2017/6/28',''),(3,12,'ONMATH-900','sample_name_3','11-A','3','','43','A','2017/6/28',''),(4,12,'ONMATH-900','sample_name_4','11-B','','','','A','2017/6/28',''),(5,12,'ONMATH-900','sample_name_5','12-A','','','','A','2017/6/28',''),(6,12,'ONMATH-900','sample_name_6','12-B','','3','','B','2017/6/28','haha'),(7,12,'ONMATH-900','sample_name_7','13-A','','','','A','2017/6/28',''),(8,12,'ONMATH-900','sample_name_8','13-B','','','23','A','2017/6/28',''),(9,12,'ONMATH-900','sample_name_9','14-A','','','','A','2017/6/28',''),(10,12,'ONMATH-900','sample_name_10','14-B','','','','A','2017/6/28',''),(11,14,'ONMATH-903','test_1','15-A','','','','A','2017/7/1',''),(12,14,'ONMATH-903','test_2','15-B','','','','B','2017/7/1',''),(13,14,'ONMATH-903','test_3','16-A','','3','','A','2017/7/1',''),(14,14,'ONMATH-903','test_4','16-B','43','','','C','2017/7/1',''),(15,14,'ONMATH-903','test_5','17-A','','','','A','2017/7/1',''),(16,14,'ONMATH-903','test_6','17-B','','','','A','2017/7/1','haha'),(17,14,'ONMATH-903','test_7','18-A','','','23','A','2017/7/1',''),(18,14,'ONMATH-903','test_8','18-B','','3','','A','2017/7/1',''),(19,14,'ONMATH-903','test_9','19-A','','','','A','2017/7/1',''),(20,14,'ONMATH-903','test_10','19-B','','','','C','2017/7/21',''),(21,21,'ONMATH-909','haha_1','20-A','','','43','A','2017/7/21',''),(22,21,'ONMATH-909','haha_2','20-B','','','','A','2017/7/21',''),(23,21,'ONMATH-909','haha_3','21-A','43','4','','D','2017/7/21',''),(24,21,'ONMATH-909','haha_4','21-B','','','','D','2017/7/21',''),(25,21,'ONMATH-909','haha_5','22-A','','','','D','2017/7/21','haha'),(26,21,'ONMATH-909','haha_6','22-B','3','','','D','2017/7/21',''),(27,21,'ONMATH-909','haha_7','123-A','','','43','D','2017/7/21',''),(28,21,'ONMATH-909','haha_8','123-B','','4','','D','2017/7/21',''),(29,21,'ONMATH-909','haha_9','131-A','43','','','D','2017/7/21',''),(30,21,'ONMATH-909','haha_10','131-B','','4','','D','2017/7/21',''),(31,21,'ONMATH-909','Haha_1','test_id_1','','','','D','','haha'),(32,21,'ONMATH-909','Haha_2','test_id_2','3','','1','A','','test'),(33,21,'ONMATH-909','Haha_3','test_id_3','','','','A','',''),(34,21,'ONMATH-909','Haha_4','test_id_4','','','','A','',''),(35,21,'ONMATH-909','Haha_5','test_id_5','','1','','C','',''),(36,21,'ONMATH-909','Haha_6','test_id_6','','','','A','',''),(37,21,'ONMATH-909','Haha_7','test_id_7','','','3','A','','haha'),(38,21,'ONMATH-909','Haha_8','test_id_8','','','','A','',''),(39,21,'ONMATH-909','Haha_9','test_id_9','5','','6','D','',''),(40,21,'ONMATH-909','Haha_10','test_id_10','','','','A','','');
+INSERT INTO `quality_check` VALUES (1,12,'ONMATH-900','sample_name_1','P12D1706N1','10-A','11','3','','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(2,12,'ONMATH-900','sample_name_2','P12D1706N2','10-B','','','','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(3,12,'ONMATH-900','sample_name_3','P12D1706N3','11-A','3','','43','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(4,12,'ONMATH-900','sample_name_4','P12D1706N4','11-B','','','','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(5,12,'ONMATH-900','sample_name_5','P12D1706N5','12-A','','','','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(6,12,'ONMATH-900','sample_name_6','P12D1706N6','12-B','','3','','B','2017-06-28 00:00:00','haha',NULL,NULL,'N'),(7,12,'ONMATH-900','sample_name_7','P12D1706N7','13-A','','','','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(8,12,'ONMATH-900','sample_name_8','P12D1706N8','13-B','','','23','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(9,12,'ONMATH-900','sample_name_9','P12D1706N9','14-A','','','','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(10,12,'ONMATH-900','sample_name_10','P12D1706N10','14-B','','','','A','2017-06-28 00:00:00','',NULL,NULL,'N'),(11,14,'ONMATH-903','test_1',NULL,'15-A','','','','A','2017-07-01 00:00:00','',NULL,NULL,NULL),(12,14,'ONMATH-903','test_2',NULL,'15-B','','','','B','2017-07-01 00:00:00','',NULL,NULL,NULL),(13,14,'ONMATH-903','test_3',NULL,'16-A','','3','','A','2017-07-01 00:00:00','',NULL,NULL,NULL),(14,14,'ONMATH-903','test_4',NULL,'16-B','43','','','C','2017-07-01 00:00:00','',NULL,NULL,NULL),(15,14,'ONMATH-903','test_5',NULL,'17-A','','','','A','2017-07-01 00:00:00','',NULL,NULL,NULL),(16,14,'ONMATH-903','test_6',NULL,'17-B','','','','A','2017-07-01 00:00:00','haha',NULL,NULL,NULL),(17,14,'ONMATH-903','test_7',NULL,'18-A','','','23','A','2017-07-01 00:00:00','',NULL,NULL,NULL),(18,14,'ONMATH-903','test_8',NULL,'18-B','','3','','A','2017-07-01 00:00:00','',NULL,NULL,NULL),(19,14,'ONMATH-903','test_9',NULL,'19-A','','','','A','2017-07-01 00:00:00','',NULL,NULL,NULL),(20,14,'ONMATH-903','test_10',NULL,'19-B','','','','C','2017-07-21 00:00:00','',NULL,NULL,NULL),(21,21,'ONMATH-909','haha_1',NULL,'20-A','','','43','A','2017-07-21 00:00:00','',NULL,NULL,NULL),(22,21,'ONMATH-909','haha_2',NULL,'20-B','','','','A','2017-07-21 00:00:00','',NULL,NULL,NULL),(23,21,'ONMATH-909','haha_3',NULL,'21-A','43','4','','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(24,21,'ONMATH-909','haha_4',NULL,'21-B','','','','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(25,21,'ONMATH-909','haha_5',NULL,'22-A','','','','D','2017-07-21 00:00:00','haha',NULL,NULL,NULL),(26,21,'ONMATH-909','haha_6',NULL,'22-B','3','','','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(27,21,'ONMATH-909','haha_7',NULL,'123-A','','','43','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(28,21,'ONMATH-909','haha_8',NULL,'123-B','','4','','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(29,21,'ONMATH-909','haha_9',NULL,'131-A','43','','','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(30,21,'ONMATH-909','haha_10',NULL,'131-B','','4','','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(31,21,'ONMATH-909','Haha_1',NULL,'test_id_1','','','','D','2017-07-21 00:00:00','haha',NULL,NULL,NULL),(32,21,'ONMATH-909','Haha_2',NULL,'test_id_2','3','','1','A','2017-07-21 00:00:00','test',NULL,NULL,NULL),(33,21,'ONMATH-909','Haha_3',NULL,'test_id_3','','','','A','2017-07-21 00:00:00','',NULL,NULL,NULL),(34,21,'ONMATH-909','Haha_4',NULL,'test_id_4','','','','A','2017-07-21 00:00:00','',NULL,NULL,NULL),(35,21,'ONMATH-909','Haha_5',NULL,'test_id_5','','1','','C','2017-07-21 00:00:00','',NULL,NULL,NULL),(36,21,'ONMATH-909','Haha_6',NULL,'test_id_6','','','','A','2017-07-21 00:00:00','',NULL,NULL,NULL),(37,21,'ONMATH-909','Haha_7',NULL,'test_id_7','','','3','A','2017-07-21 00:00:00','haha',NULL,NULL,NULL),(38,21,'ONMATH-909','Haha_8',NULL,'test_id_8','','','','A','2017-07-21 00:00:00','',NULL,NULL,NULL),(39,21,'ONMATH-909','Haha_9',NULL,'test_id_9','5','','6','D','2017-07-21 00:00:00','',NULL,NULL,NULL),(40,21,'ONMATH-909','Haha_10',NULL,'test_id_10','','','','A','2017-07-21 00:00:00','',NULL,NULL,NULL),(42,12,'ONMATH-900','sample_name_1','P12D1706N1','10-A','11','','23','A','2017-08-21 00:00:00','','2017-08-21 02:43:30',NULL,'N'),(43,12,'ONMATH-900','sample_name_1','P12D1706N1','10-A','11','','23','A','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(44,12,'ONMATH-900','sample_name_2','P12D1706N2','10-B','','','','D','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(45,12,'ONMATH-900','sample_name_3','P12D1706N3','11-A','','2','','A','2017-08-21 00:00:00','test2','2017-08-21 02:45:43',NULL,'N'),(46,12,'ONMATH-900','sample_name_4','P12D1706N4','11-B','','','','D','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(47,12,'ONMATH-900','sample_name_5','P12D1706N5','12-A','2','','32','A','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(48,12,'ONMATH-900','sample_name_6','P12D1706N6','12-B','','1','','D','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(49,12,'ONMATH-900','sample_name_7','P12D1706N7','13-A','1','','','A','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(50,12,'ONMATH-900','sample_name_8','P12D1706N8','13-B','','','','D','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(51,12,'ONMATH-900','sample_name_9','P12D1706N9','14-A','2','','32','A','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(52,12,'ONMATH-900','sample_name_10','P12D1706N10','14-B','','2','','D','2017-08-21 00:00:00','','2017-08-21 02:45:43',NULL,'N'),(53,12,'ONMATH-900','sample_name_1','P12D1706N1','10-A','11','','23','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(54,12,'ONMATH-900','sample_name_2','P12D1706N2','10-B','','','','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(55,12,'ONMATH-900','sample_name_3','P12D1706N3','11-A','','2','','D','2017-08-20 16:00:00','test2','2017-08-20 23:14:00',NULL,'N'),(56,12,'ONMATH-900','sample_name_4','P12D1706N4','11-B','','','','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(57,12,'ONMATH-900','sample_name_5','P12D1706N5','12-A','2','','32','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(58,12,'ONMATH-900','sample_name_6','P12D1706N6','12-B','','1','','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(59,12,'ONMATH-900','sample_name_7','P12D1706N7','13-A','1','','','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(60,12,'ONMATH-900','sample_name_8','P12D1706N8','13-B','','','','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(61,12,'ONMATH-900','sample_name_9','P12D1706N9','14-A','2','','32','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(62,12,'ONMATH-900','sample_name_10','P12D1706N10','14-B','','2','','D','2017-08-20 16:00:00','','2017-08-20 23:14:00',NULL,'N'),(63,12,'ONMATH-900','sample_name_1','P12D1706N1','10-A','11','','23','A','2017-08-21 00:00:00','','2017-08-21 15:18:00','成都','Y'),(64,12,'ONMATH-900','sample_name_2','P12D1706N2','10-B','','','','D','2017-08-21 00:00:00','','2017-08-21 15:18:00','北京','Y'),(65,12,'ONMATH-900','sample_name_3','P12D1706N3','11-A','','2','','A','2017-08-21 00:00:00','test2','2017-08-21 15:18:00',NULL,'Y'),(66,12,'ONMATH-900','sample_name_4','P12D1706N4','11-B','','','','D','2017-08-21 00:00:00','','2017-08-21 15:18:00',NULL,'Y'),(67,12,'ONMATH-900','sample_name_5','P12D1706N5','12-A','2','','32','A','2017-08-21 00:00:00','','2017-08-21 15:18:00',NULL,'Y'),(68,12,'ONMATH-900','sample_name_6','P12D1706N6','12-B','','1','','D','2017-08-21 00:00:00','','2017-08-21 15:18:00',NULL,'Y'),(69,12,'ONMATH-900','sample_name_7','P12D1706N7','13-A','1','','','A','2017-08-21 00:00:00','','2017-08-21 15:18:00',NULL,'Y'),(70,12,'ONMATH-900','sample_name_8','P12D1706N8','13-B','','','','D','2017-08-21 00:00:00','','2017-08-21 15:18:00',NULL,'Y'),(71,12,'ONMATH-900','sample_name_9','P12D1706N9','14-A','2','','32','A','2017-08-21 00:00:00','','2017-08-21 15:18:00',NULL,'Y'),(72,12,'ONMATH-900','sample_name_10','P12D1706N10','14-B','','2','','D','2017-08-21 00:00:00','','2017-08-21 15:18:00',NULL,'Y');
 /*!40000 ALTER TABLE `quality_check` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `receipt_info`
+--
+
+DROP TABLE IF EXISTS `receipt_info`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `receipt_info` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `project_id` int(11) DEFAULT NULL,
+  `project_number` varchar(45) DEFAULT NULL,
+  `expense` int(11) DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `comment` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `receipt_info`
+--
+
+LOCK TABLES `receipt_info` WRITE;
+/*!40000 ALTER TABLE `receipt_info` DISABLE KEYS */;
+INSERT INTO `receipt_info` VALUES (4,21,'ONMATH-909',1000,'2017-08-17 03:11:34','haha');
+/*!40000 ALTER TABLE `receipt_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -614,6 +711,36 @@ CREATE TABLE `receive_sample` (
 LOCK TABLES `receive_sample` WRITE;
 /*!40000 ALTER TABLE `receive_sample` DISABLE KEYS */;
 /*!40000 ALTER TABLE `receive_sample` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `return_sample`
+--
+
+DROP TABLE IF EXISTS `return_sample`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `return_sample` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sample_name` varchar(45) DEFAULT NULL,
+  `sample_id` varchar(45) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `time` datetime DEFAULT NULL,
+  `upload_time` varchar(45) DEFAULT NULL,
+  `comment` varchar(100) DEFAULT NULL,
+  `status` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `return_sample`
+--
+
+LOCK TABLES `return_sample` WRITE;
+/*!40000 ALTER TABLE `return_sample` DISABLE KEYS */;
+INSERT INTO `return_sample` VALUES (1,'sample_name_1','10-A','成都','2017-08-23 00:00:00','2017-08-23 17:29','test11','Y'),(2,'sample_name_2','10-B','北京','2017-08-23 00:00:00','2017-08-23 17:29','test2','Y');
+/*!40000 ALTER TABLE `return_sample` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -798,7 +925,7 @@ CREATE TABLE `sample_project_master` (
 
 LOCK TABLES `sample_project_master` WRITE;
 /*!40000 ALTER TABLE `sample_project_master` DISABLE KEYS */;
-INSERT INTO `sample_project_master` VALUES (6,'ONMATH-6',NULL,NULL,'tttetset',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wait_send',NULL,'2017-06-06'),(7,'ONMATH-7',NULL,NULL,'tttetset',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wait_send',NULL,'2017-06-06'),(8,'ONMATH-8','testttt','','tttetset','','','','','','','chencheng','wait_send','test','2017-06-06 09:14:44.235154'),(10,'ONMATH-10','11231231','','213123123','','','','','','','chencheng','wait_send','test','2017-06-06 09:18:10.389281'),(12,'ONMATH-900','4444','','5555','','','','','','','chencheng','send_sample','test','2017-06-06 09:26:42.492849'),(14,'ONMATH-903','test-test','test','test--test','','','','','','','chencheng','wait_send','test','2017-06-07 04:41:18.758856'),(15,'ONMATH-904','haha','','haha','','','','','','','chencheng','wait_send','test','2017-06-23 19:26:43.477432'),(16,'ONMATH-905','haha','','haha','','','','','','','chencheng','wait_send','test','2017-06-23 19:29:26.224983'),(17,'ONMATH-906','haha','','haha','','','','','','','chencheng','wait_send','test','2017-06-23 19:30:30.841083'),(19,'ONMATH-907','test_project1','四川农业大学','haha','haha@haha.com','','','','','','chencheng','wait_send','haha','2017-07-17 11:11:43.131307'),(20,'ONMATH-908','test_project2','四川农业大学','haha','haha@haha.com','','','','','鸡','chencheng','wait_send','haha','2017-07-17 15:28:01.598447'),(21,'ONMATH-909','haha',NULL,'fafa',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'downmachine',NULL,'2017-07-20');
+INSERT INTO `sample_project_master` VALUES (6,'ONMATH-6',NULL,NULL,'tttetset',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wait_send',NULL,'2017-06-06'),(7,'ONMATH-7',NULL,NULL,'tttetset',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'wait_send',NULL,'2017-06-06'),(8,'ONMATH-8','testttt','','tttetset','','','','','','','chencheng','wait_send','test','2017-06-06 09:14:44.235154'),(10,'ONMATH-10','11231231','','213123123','','','','','','','chencheng','wait_send','test','2017-06-06 09:18:10.389281'),(12,'ONMATH-900','4444','','5555','','','','','','','chencheng','downmachine','test','2017-06-06 09:26:42.492849'),(14,'ONMATH-903','test-test','test','test--test','','','','','','','chencheng','quality_check','test','2017-06-07 04:41:18.758856'),(15,'ONMATH-904','haha','','haha','','','','','','','chencheng','wait_send','test','2017-06-23 19:26:43.477432'),(16,'ONMATH-905','haha','','haha','','','','','','','chencheng','wait_send','test','2017-06-23 19:29:26.224983'),(17,'ONMATH-906','haha','','haha','','','','','','','chencheng','wait_send','test','2017-06-23 19:30:30.841083'),(19,'ONMATH-907','test_project1','四川农业大学','haha','haha@haha.com','','','','','','chencheng','wait_send','haha','2017-07-17 11:11:43.131307'),(20,'ONMATH-908','test_project2','四川农业大学','haha','haha@haha.com','','','','','鸡','chencheng','wait_send','haha','2017-07-17 15:28:01.598447'),(21,'ONMATH-909','haha',NULL,'fafa',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'downmachine',NULL,'2017-07-20');
 /*!40000 ALTER TABLE `sample_project_master` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -916,12 +1043,15 @@ CREATE TABLE `send_sample` (
   `project_number` varchar(45) DEFAULT NULL,
   `sample_name` varchar(45) DEFAULT NULL,
   `species` varchar(45) DEFAULT NULL,
+  `om_id` varchar(100) DEFAULT NULL,
   `express_number` varchar(45) DEFAULT NULL,
   `product_num` varchar(45) DEFAULT NULL,
-  `time` varchar(45) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
   `comment` varchar(100) DEFAULT NULL,
+  `upload_time` varchar(45) DEFAULT NULL,
+  `status` varchar(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=196 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -930,7 +1060,7 @@ CREATE TABLE `send_sample` (
 
 LOCK TABLES `send_sample` WRITE;
 /*!40000 ALTER TABLE `send_sample` DISABLE KEYS */;
-INSERT INTO `send_sample` VALUES (1,12,'ONMATH-900','sample_name_1','chicken','2113234','1','2017/6/21',''),(2,12,'ONMATH-900','sample_name_2','chicken','2113234','1','2017/6/21',''),(3,12,'ONMATH-900','sample_name_3','chicken','2113234','1','2017/6/21',''),(4,12,'ONMATH-900','sample_name_4','chicken','2113234','1','2017/6/21',''),(5,12,'ONMATH-900','sample_name_5','chicken','2113234','1','2017/6/21','haha'),(6,12,'ONMATH-900','sample_name_6','chicken','43424234','1','2017/6/21',''),(7,12,'ONMATH-900','sample_name_7','chicken','43424234','1','2017/6/21',''),(8,12,'ONMATH-900','sample_name_8','chicken','43424234','1','2017/6/21',''),(9,12,'ONMATH-900','sample_name_9','chicken','43424234','1','2017/6/21',''),(10,12,'ONMATH-900','sample_name_10','chicken','43424234','1','2017/6/21',''),(11,14,'ONMATH-903','test_1','dog','41343242','1','2017/6/28','600'),(12,14,'ONMATH-903','test_2','dog','41343242','1','2017/6/28',''),(13,14,'ONMATH-903','test_3','dog','','1','2017/6/28',''),(14,14,'ONMATH-903','test_4','dog','41435354','1','2017/6/28',''),(15,14,'ONMATH-903','test_5','dog','41435354','1','2017/6/28',''),(16,14,'ONMATH-903','test_6','dog','41435354','1','2017/6/28',''),(17,14,'ONMATH-903','test_7','dog','41435354','1','2017/6/28',''),(18,14,'ONMATH-903','test_8','dog','41435354','1','2017/6/28',''),(19,14,'ONMATH-903','test_9','dog','41435354','1','2017/6/28',''),(20,14,'ONMATH-903','test_10','dog','','1','2017/7/17',''),(67,21,'ONMATH-909','test_name_1','狗','12313222','1','2017-08-01','test'),(68,21,'ONMATH-909','test_name_2','狗','12313222','1','2017-08-01',''),(69,21,'ONMATH-909','test_name_3','狗','12313222','1','2017-08-02','test'),(70,21,'ONMATH-909','test_name_4','狗','12313222','1','2017-08-02','hsa'),(71,21,'ONMATH-909','test_name_5','狗','12313222','2','2017-08-03',''),(72,21,'ONMATH-909','test_name_6','狗','12313222','1','2017-08-03','haha'),(73,21,'ONMATH-909','test_name_7','狗','12313222','2','2017-08-04',''),(74,21,'ONMATH-909','test_name_8','狗','12313222','1','2017-08-04',''),(75,21,'ONMATH-909','test_name_9','狗','12313222','1','2017-08-05','');
+INSERT INTO `send_sample` VALUES (1,12,'ONMATH-900','sample_name_1','chicken','P12D1706N1','2113234','1','2017-06-21 00:00:00','',NULL,'N'),(2,12,'ONMATH-900','sample_name_2','chicken','P12D1706N2','2113234','1','2017-06-21 00:00:00','',NULL,'N'),(3,12,'ONMATH-900','sample_name_3','chicken','P12D1706N3','2113234','1','2017-06-21 00:00:00','',NULL,'N'),(4,12,'ONMATH-900','sample_name_4','chicken','P12D1706N4','2113234','1','2017-06-21 00:00:00','',NULL,'N'),(5,12,'ONMATH-900','sample_name_5','chicken','P12D1706N5','2113234','1','2017-06-21 00:00:00','haha',NULL,'N'),(6,12,'ONMATH-900','sample_name_6','chicken','P12D1706N6','43424234','1','2017-06-21 00:00:00','',NULL,'N'),(7,12,'ONMATH-900','sample_name_7','chicken','P12D1706N7','43424234','1','2017-06-21 00:00:00','',NULL,'N'),(8,12,'ONMATH-900','sample_name_8','chicken','P12D1706N8','43424234','1','2017-06-21 00:00:00','',NULL,'N'),(9,12,'ONMATH-900','sample_name_9','chicken','P12D1706N9','43424234','1','2017-06-21 00:00:00','',NULL,'N'),(10,12,'ONMATH-900','sample_name_10','chicken','P12D1706N10','43424234','1','2017-06-21 00:00:00','',NULL,'N'),(11,14,'ONMATH-903','test_1','dog',NULL,'41343242','1','2017-06-28 00:00:00','600',NULL,NULL),(12,14,'ONMATH-903','test_2','dog',NULL,'41343242','1','2017-06-28 00:00:00','',NULL,NULL),(13,14,'ONMATH-903','test_3','dog',NULL,'','1','2017-06-28 00:00:00','',NULL,NULL),(14,14,'ONMATH-903','test_4','dog',NULL,'41435354','1','2017-06-28 00:00:00','',NULL,NULL),(15,14,'ONMATH-903','test_5','dog',NULL,'41435354','1','2017-06-28 00:00:00','',NULL,NULL),(16,14,'ONMATH-903','test_6','dog',NULL,'41435354','1','2017-06-28 00:00:00','',NULL,NULL),(17,14,'ONMATH-903','test_7','dog',NULL,'41435354','1','2017-06-28 00:00:00','',NULL,NULL),(18,14,'ONMATH-903','test_8','dog',NULL,'41435354','1','2017-06-28 00:00:00','',NULL,NULL),(19,14,'ONMATH-903','test_9','dog',NULL,'41435354','1','2017-06-28 00:00:00','',NULL,NULL),(20,14,'ONMATH-903','test_10','dog',NULL,'','1','2017-07-17 00:00:00','',NULL,NULL),(67,21,'ONMATH-909','test_name_1','狗',NULL,'12313222','1','2017-08-01 00:00:00','tesfa',NULL,NULL),(68,21,'ONMATH-909','test_name_2','狗',NULL,'12313222','1','2017-08-01 00:00:00','',NULL,NULL),(69,21,'ONMATH-909','test_name_3','狗',NULL,'12313222','1','2017-08-02 00:00:00','test',NULL,NULL),(70,21,'ONMATH-909','test_name_4','狗',NULL,'12313222','1','2017-08-02 00:00:00','hsa',NULL,NULL),(71,21,'ONMATH-909','test_name_5','狗',NULL,'12313222','2','2017-08-03 00:00:00','',NULL,NULL),(72,21,'ONMATH-909','test_name_6','狗',NULL,'12313222','1','2017-08-03 00:00:00','haha',NULL,NULL),(73,21,'ONMATH-909','test_name_7','狗',NULL,'12313222','2','2017-08-04 00:00:00','',NULL,NULL),(74,21,'ONMATH-909','test_name_8','狗',NULL,'12313222','1','2017-08-04 00:00:00','',NULL,NULL),(75,21,'ONMATH-909','test_name_9','狗',NULL,'12313222','1','2017-08-05 00:00:00','',NULL,NULL),(126,12,'ONMATH-900','Sample_1','狗','P12D1706N1','123121','1','2017-08-17 16:00:00','haha','2017-08-21 03:27','N'),(127,12,'ONMATH-900','Sample_2','狗','P12D1706N2','123121','1','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(128,12,'ONMATH-900','Sample_3','狗','P12D1706N3','123121','1','2017-08-17 16:00:00','test2','2017-08-21 03:27','N'),(129,12,'ONMATH-900','Sample_4','狗','P12D1706N4','123121','1','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(130,12,'ONMATH-900','Sample_5','狗','P12D1706N5','123121','2','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(131,12,'ONMATH-900','Sample_6','狗','P12D1706N6','123121','1','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(132,12,'ONMATH-900','Sample_7','狗','P12D1706N7','123121','1','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(133,12,'ONMATH-900','Sample_8','狗','P12D1706N8','123121','1','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(134,12,'ONMATH-900','Sample_9','狗','P12D1706N9','123121','2','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(135,12,'ONMATH-900','Sample_10','狗','P12D1706N10','123121','1','2017-08-17 16:00:00','','2017-08-21 03:27','N'),(136,12,'ONMATH-900','Sample_1','狗','P12D1706N1','123121','1','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(137,12,'ONMATH-900','Sample_2','狗','P12D1706N2','123121','1','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(138,12,'ONMATH-900','Sample_3','狗','P12D1706N3','123121','1','2017-08-17 16:00:00','test2','2017-08-21 06:50','N'),(139,12,'ONMATH-900','Sample_4','狗','P12D1706N4','123121','1','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(140,12,'ONMATH-900','Sample_5','狗','P12D1706N5','123121','2','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(141,12,'ONMATH-900','Sample_6','狗','P12D1706N6','123121','1','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(142,12,'ONMATH-900','Sample_7','狗','P12D1706N7','123121','1','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(143,12,'ONMATH-900','Sample_8','狗','P12D1706N8','123121','1','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(144,12,'ONMATH-900','Sample_9','狗','P12D1706N9','123121','2','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(145,12,'ONMATH-900','Sample_10','狗','P12D1706N10','123121','1','2017-08-17 16:00:00','','2017-08-21 06:50','N'),(146,12,'ONMATH-900','Sample_1','狗','P12D1706N1','123121','1','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(147,12,'ONMATH-900','Sample_2','狗','P12D1706N2','123121','1','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(148,12,'ONMATH-900','Sample_3','狗','P12D1706N3','123121','1','2017-08-17 16:00:00','test2','2017-08-21 06:52','N'),(149,12,'ONMATH-900','Sample_4','狗','P12D1706N4','123121','1','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(150,12,'ONMATH-900','Sample_5','狗','P12D1706N5','123121','2','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(151,12,'ONMATH-900','Sample_6','狗','P12D1706N6','123121','1','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(152,12,'ONMATH-900','Sample_7','狗','P12D1706N7','123121','1','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(153,12,'ONMATH-900','Sample_8','狗','P12D1706N8','123121','1','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(154,12,'ONMATH-900','Sample_9','狗','P12D1706N9','123121','2','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(155,12,'ONMATH-900','Sample_10','狗','P12D1706N10','123121','1','2017-08-17 16:00:00','','2017-08-21 06:52','N'),(156,12,'ONMATH-900','Sample_1','狗','P12D1706N1','123121','1','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(157,12,'ONMATH-900','Sample_2','狗','P12D1706N2','123121','1','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(158,12,'ONMATH-900','Sample_3','狗','P12D1706N3','123121','1','2017-08-17 16:00:00','test2','2017-08-20 23:03','N'),(159,12,'ONMATH-900','Sample_4','狗','P12D1706N4','123121','1','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(160,12,'ONMATH-900','Sample_5','狗','P12D1706N5','123121','2','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(161,12,'ONMATH-900','Sample_6','狗','P12D1706N6','123121','1','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(162,12,'ONMATH-900','Sample_7','狗','P12D1706N7','123121','1','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(163,12,'ONMATH-900','Sample_8','狗','P12D1706N8','123121','1','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(164,12,'ONMATH-900','Sample_9','狗','P12D1706N9','123121','2','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(165,12,'ONMATH-900','Sample_10','狗','P12D1706N10','123121','1','2017-08-17 16:00:00','','2017-08-20 23:03','N'),(166,12,'ONMATH-900','Sample_1','狗','P12D1706N1','123121','1','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(167,12,'ONMATH-900','Sample_2','狗','P12D1706N2','123121','1','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(168,12,'ONMATH-900','Sample_3','狗','P12D1706N3','123121','1','2017-08-17 16:00:00','test2','2017-08-20 23:07','N'),(169,12,'ONMATH-900','Sample_4','狗','P12D1706N4','123121','1','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(170,12,'ONMATH-900','Sample_5','狗','P12D1706N5','123121','2','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(171,12,'ONMATH-900','Sample_6','狗','P12D1706N6','123121','1','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(172,12,'ONMATH-900','Sample_7','狗','P12D1706N7','123121','1','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(173,12,'ONMATH-900','Sample_8','狗','P12D1706N8','123121','1','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(174,12,'ONMATH-900','Sample_9','狗','P12D1706N9','123121','2','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(175,12,'ONMATH-900','Sample_10','狗','P12D1706N10','123121','1','2017-08-17 16:00:00','','2017-08-20 23:07','N'),(176,12,'ONMATH-900','Sample_1','狗','P12D1706N1','123121','1','2017-08-18 00:00:00','haha','2017-08-21 17:07','Y'),(177,12,'ONMATH-900','Sample_2','狗','P12D1706N2','123121','1','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(178,12,'ONMATH-900','Sample_3','狗','P12D1706N3','123121','1','2017-08-18 00:00:00','test2','2017-08-21 17:07','Y'),(179,12,'ONMATH-900','Sample_4','狗','P12D1706N4','123121','1','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(180,12,'ONMATH-900','Sample_5','狗','P12D1706N5','123121','2','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(181,12,'ONMATH-900','Sample_6','狗','P12D1706N6','123121','1','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(182,12,'ONMATH-900','Sample_7','狗','P12D1706N7','123121','1','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(183,12,'ONMATH-900','Sample_8','狗','P12D1706N8','123121','1','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(184,12,'ONMATH-900','Sample_9','狗','P12D1706N9','123121','2','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(185,12,'ONMATH-900','Sample_10','狗','P12D1706N10','123121','1','2017-08-18 00:00:00','','2017-08-21 17:07','Y'),(186,12,'ONMATH-900','Sample_1','狗','P12D1706N1','123121','1','2017-08-18 00:00:00','haha','2017-08-21 17:10','N'),(187,12,'ONMATH-900','Sample_2','狗','P12D1706N2','123121','1','2017-08-18 00:00:00','','2017-08-21 17:10','N'),(188,12,'ONMATH-900','Sample_3','狗','P12D1706N3','123121','1','2017-08-18 00:00:00','test2','2017-08-21 17:10','N'),(189,12,'ONMATH-900','Sample_4','狗','P12D1706N4','123121','1','2017-08-18 00:00:00','','2017-08-21 17:10','N'),(190,12,'ONMATH-900','Sample_5','狗','P12D1706N5','123121','2','2017-08-18 00:00:00','','2017-08-21 17:10','N'),(191,12,'ONMATH-900','Sample_6','狗','P12D1706N6','123121','1','2017-08-18 00:00:00','','2017-08-21 17:10','N'),(192,12,'ONMATH-900','Sample_7','狗','P12D1706N7','123121','1','2017-08-18 00:00:00','','2017-08-21 17:10','N'),(193,12,'ONMATH-900','Sample_8','狗','P12D1706N8','123121','1','2017-08-18 00:00:00','','2017-08-21 17:10','N'),(194,12,'ONMATH-900','Sample_9','狗','P12D1706N9','123121','2','2017-08-18 00:00:00','','2017-08-21 17:10','N'),(195,12,'ONMATH-900','Sample_10','狗','P12D1706N10','123121','1','2017-08-18 00:00:00','','2017-08-21 17:10','N');
 /*!40000 ALTER TABLE `send_sample` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -946,14 +1076,17 @@ CREATE TABLE `upmachine` (
   `project_id` int(11) DEFAULT NULL,
   `project_number` varchar(45) DEFAULT NULL,
   `sample_name` varchar(45) DEFAULT NULL,
+  `om_id` varchar(100) DEFAULT NULL,
   `sample_id` varchar(45) DEFAULT NULL,
   `upmachinetype` varchar(45) DEFAULT NULL,
   `mode` varchar(45) DEFAULT NULL,
   `data_count` varchar(45) DEFAULT NULL,
-  `time` varchar(45) DEFAULT NULL,
+  `create_time` datetime DEFAULT NULL,
   `comment` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `sample_id_UNIQUE` (`sample_id`)
+  `upload_time` varchar(45) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `status` varchar(1) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -963,7 +1096,7 @@ CREATE TABLE `upmachine` (
 
 LOCK TABLES `upmachine` WRITE;
 /*!40000 ALTER TABLE `upmachine` DISABLE KEYS */;
-INSERT INTO `upmachine` VALUES (1,12,'ONMATH-900','sample_name_1','10-A','','','4','2017/6/30',''),(2,12,'ONMATH-900','sample_name_2','10-B','','','4','2017/6/30',''),(3,12,'ONMATH-900','sample_name_3','11-A','','','4','2017/6/30',''),(4,12,'ONMATH-900','sample_name_4','11-B','','','4','2017/6/30','test'),(5,12,'ONMATH-900','sample_name_5','12-A','','','4','2017/6/30',''),(6,12,'ONMATH-900','sample_name_6','12-B','','','','2017/6/30',''),(7,12,'ONMATH-900','sample_name_7','13-A','','','6','2017/6/30',''),(8,12,'ONMATH-900','sample_name_8','13-B','','','','2017/6/30',''),(9,12,'ONMATH-900','sample_name_9','14-A','','','3','2017/6/30',''),(10,12,'ONMATH-900','sample_name_10','14-B','','','','2017/6/30','test'),(11,14,'ONMATH-903','test_1','15-A','','','2','2017/7/5',''),(12,14,'ONMATH-903','test_2','15-B','','','2','2017/7/5',''),(13,14,'ONMATH-903','test_3','16-A','','','2','2017/7/5',''),(14,14,'ONMATH-903','test_4','16-B','','','2','2017/7/5',''),(15,14,'ONMATH-903','test_5','17-A','','','2','2017/7/5',''),(16,14,'ONMATH-903','test_6','17-B','','','2','2017/7/5',''),(17,14,'ONMATH-903','test_7','18-A','','','2','2017/7/5',''),(18,14,'ONMATH-903','test_8','18-B','','','2','2017/7/5',''),(19,14,'ONMATH-903','test_9','19-A','','','2','2017/7/5',''),(20,14,'ONMATH-903','test_10','19-B','','','2','2017/7/25',''),(21,21,'ONMATH-909','haha_1','20-A','','','','2017/7/25',''),(22,21,'ONMATH-909','haha_2','20-B','','','','2017/7/25','test'),(23,21,'ONMATH-909','haha_3','21-A','','','','2017/7/25',''),(24,21,'ONMATH-909','haha_4','21-B','','','6','2017/7/25',''),(25,21,'ONMATH-909','haha_5','22-A','','','','2017/7/25',''),(26,21,'ONMATH-909','haha_6','22-B','','','','2017/7/25',''),(27,21,'ONMATH-909','haha_7','123-A','','','5','2017/7/25',''),(28,21,'ONMATH-909','haha_8','123-B','','','','2017/7/25',''),(29,21,'ONMATH-909','haha_9','131-A','','','','2017/7/25',''),(30,21,'ONMATH-909','haha_10','131-B','','','','2017/7/25','');
+INSERT INTO `upmachine` VALUES (1,12,'ONMATH-900','sample_name_1',NULL,'10-A','','','4','2017-06-30 00:00:00','',NULL,NULL,NULL),(2,12,'ONMATH-900','sample_name_2',NULL,'10-B','','','4','2017-06-30 00:00:00','',NULL,NULL,NULL),(3,12,'ONMATH-900','sample_name_3',NULL,'11-A','','','4','2017-06-30 00:00:00','',NULL,NULL,NULL),(4,12,'ONMATH-900','sample_name_4',NULL,'11-B','','','4','2017-06-30 00:00:00','test',NULL,NULL,NULL),(5,12,'ONMATH-900','sample_name_5',NULL,'12-A','','','4','2017-06-30 00:00:00','',NULL,NULL,NULL),(6,12,'ONMATH-900','sample_name_6',NULL,'12-B','','','','2017-06-30 00:00:00','',NULL,NULL,NULL),(7,12,'ONMATH-900','sample_name_7',NULL,'13-A','','','6','2017-06-30 00:00:00','',NULL,NULL,NULL),(8,12,'ONMATH-900','sample_name_8',NULL,'13-B','','','','2017-06-30 00:00:00','',NULL,NULL,NULL),(9,12,'ONMATH-900','sample_name_9',NULL,'14-A','','','3','2017-06-30 00:00:00','',NULL,NULL,NULL),(10,12,'ONMATH-900','sample_name_10',NULL,'14-B','','','','2017-06-30 00:00:00','test',NULL,NULL,NULL),(11,14,'ONMATH-903','test_1',NULL,'15-A','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(12,14,'ONMATH-903','test_2',NULL,'15-B','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(13,14,'ONMATH-903','test_3',NULL,'16-A','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(14,14,'ONMATH-903','test_4',NULL,'16-B','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(15,14,'ONMATH-903','test_5',NULL,'17-A','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(16,14,'ONMATH-903','test_6',NULL,'17-B','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(17,14,'ONMATH-903','test_7',NULL,'18-A','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(18,14,'ONMATH-903','test_8',NULL,'18-B','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(19,14,'ONMATH-903','test_9',NULL,'19-A','','','2','2017-07-05 00:00:00','',NULL,NULL,NULL),(20,14,'ONMATH-903','test_10',NULL,'19-B','','','2','2017-07-25 00:00:00','',NULL,NULL,NULL),(21,21,'ONMATH-909','haha_1',NULL,'20-A','','','','2017-07-25 00:00:00','',NULL,NULL,NULL),(22,21,'ONMATH-909','haha_2',NULL,'20-B','','','','2017-07-25 00:00:00','test',NULL,NULL,NULL),(23,21,'ONMATH-909','haha_3',NULL,'21-A','','','','2017-07-25 00:00:00','',NULL,NULL,NULL),(24,21,'ONMATH-909','haha_4',NULL,'21-B','','','6','2017-07-25 00:00:00','',NULL,NULL,NULL),(25,21,'ONMATH-909','haha_5',NULL,'22-A','','','','2017-07-25 00:00:00','',NULL,NULL,NULL),(26,21,'ONMATH-909','haha_6',NULL,'22-B','','','','2017-07-25 00:00:00','',NULL,NULL,NULL),(27,21,'ONMATH-909','haha_7',NULL,'123-A','','','5','2017-07-25 00:00:00','',NULL,NULL,NULL),(28,21,'ONMATH-909','haha_8',NULL,'123-B','','','','2017-07-25 00:00:00','',NULL,NULL,NULL),(29,21,'ONMATH-909','haha_9',NULL,'131-A','','','','2017-07-25 00:00:00','',NULL,NULL,NULL),(30,21,'ONMATH-909','haha_10',NULL,'131-B','','','','2017-07-25 00:00:00','',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `upmachine` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1014,4 +1147,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-08-07 14:11:01
+-- Dump completed on 2017-08-24 10:12:43

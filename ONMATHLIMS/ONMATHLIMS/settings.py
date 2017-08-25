@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'SEQ_SA_INFO',                      # Or path to database file if using sqlite3.
         'USER': os.environ.get('ONMATHLIMS_DB_USER', 'root'),
-        'PASSWORD': os.environ.get('ONMATHLIMS_DB_PASSWORD'),
+        'PASSWORD': os.environ.get('ONMATHLIMS_DB_PASSWORD', '050400'),
         'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '3306',                      # Set to empty string for default.
     }
@@ -115,15 +115,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en-zh'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

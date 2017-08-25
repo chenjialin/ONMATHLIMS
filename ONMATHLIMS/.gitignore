@@ -20,3 +20,4 @@ supervisord_local.conf
 conf_local.ini
 # all upload files
 lims_app/static/attachment/*
+lims_app/static/export/*
