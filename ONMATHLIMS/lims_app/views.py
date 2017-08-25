@@ -291,8 +291,10 @@ def upload_sample_info(request):
              'upmachine': u'上机', 'downmachine': u'下机', 'return_sample': u'返样'}
 
     username = request.COOKIES.get('username', '')
-    table_name = request.GET.get('table', '')
-    project_id = request.GET.get('project_id', '')
+    table_name = request.GET['table']
+    project_id = ''
+    if table_name != 'return_sample':
+        project_id = request.GET['project_id']
     if table_name or project_id:
         return render(request,  os.path.join(CODE_ROOT, 'lims_app/templates', 'upload.html'),
                         {'username': username, 'table': table_name, 'table_name': title[table_name], 'project_id': project_id})
