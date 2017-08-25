@@ -136,11 +136,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                {% for items in table_values %}
+                {% for n1,n2,n3,n4,n5,n6,n7,n8,n9,n10 in table_values %}
                     <tr>
-                        {% for item in items  %}
-                            <td>{{ item }}</td>
-                        {% endfor %}
+                      <th>{{n1}}</th>
+                      <th>{{n2}}</th>
+                      <th>{{n3}}</th>
+                      <th>{{n4}}</th>
+                      <th>{{n6}}</th>
+                      <th>{{n7}}</th>
+                      <th>{{n9}}</th>
                     </tr>
                 {% endfor %}
                 </tr>

@@ -62,26 +62,45 @@ def split_data(table, project_id, json_data):
 
     return insert_data, update_data
 
-
+  
+def check_omid(table, project_id, om_ids):
+    cmd = "select om_id from %s where project_id='%s'" % (table, project_id)
+    results = get_db_data(cmd)
+    results = [result[0] for result in results]
+    for om_id in om_ids:
+        if om_id not in results:
+            return 'error'
+    return 'ok'
+  
+  
 def import_data(table, project_id, json_data, username):
     project_number = SampleProjectMaster.objects.get(id=project_id).project_number
     if table == 'send_sample':
         if json_data[0].get('om_id'):
+            om_ids = [row_dict['om_id'] for row_dict in json_data]
+            if check_omid(table, project_id, om_ids) == 'error':
+                return JsonResponse({'msg': u'存在错误OMID!'})
             # insert_data, update_data = split_data(table, project_id, json_data)
-            for row_dict in json_data:
-                SendSample.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
-                p = SendSample(project_number=project_number,
-                               project_id=project_id,
-                               sample_name=row_dict['sample_name'],
-                               om_id=row_dict['om_id'],
-                               species=row_dict['species'],
-                               express_number=row_dict['express_number'],
-                               product_num=row_dict['product_num'],
-                               create_time=row_dict['time'],
-                               comment=row_dict['comment'],
-                               upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-                               status='Y')
-                p.save()
+            try:
+                upload_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                for row_dict in json_data:
+                    SendSample.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
+                    p = SendSample(project_number=project_number,
+                                   project_id=project_id,
+                                   sample_name=row_dict['sample_name'],
+                                   om_id=row_dict['om_id'],
+                                   species=row_dict['species'],
+                                   express_number=row_dict['express_number'],
+                                   product_num=row_dict['product_num'],
+                                   create_time=row_dict['time'],
+                                   comment=row_dict['comment'],
+                                   upload_time=upload_time,
+                                   status='Y')
+                    p.save()
+            except:
+                SendSample.objects.filter(project_id=project_id, upload_time=upload_time).delete()
+                return JsonResponse({'msg': u'数据格式错误!'})
+              
             LogInfo(project_id=project_id, action='更新了样品信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'更新成功!'})
         else:
@@ -90,25 +109,54 @@ def import_data(table, project_id, json_data, username):
             cmd = "select om_id from %s where project_id='%s'" % (table, project_id)
             results = get_db_data(cmd)
             if results:
-                max_number = max([int(result[0].split('N')[1]) for result in results])+1
+                max_number = max([int(result[0].split('N')[1]) for result in results])
             else:
-                max_number = 1
+                max_number = 0
 
+            om_num = 0
+            om_num += max_number
+            upload_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             for i, row_dict in enumerate(json_data):
-                om_id = ''.join([prefix, str(i+max_number)])
-                p = SendSample(project_number=project_number,
-                               project_id=project_id,
-                               sample_name=row_dict['sample_name'],
-                               om_id=om_id,
-                               species=row_dict['species'],
-                               express_number=row_dict['express_number'],
-                               product_num=row_dict['product_num'],
-                               create_time=row_dict['time'],
-                               comment=row_dict['comment'],
-                               upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-                               status='Y')
-                p.save()
-            LogInfo(project_id=project_id, action='导入了样品信息表', time=datetime.datetime.now(), manager=username).save()
+                if int(row_dict['product_num']) != 1:
+                    for j in range(int(row_dict['product_num'])):
+                        om_num += 1
+                        om_id = ''.join([prefix, str(om_num)])
+                        try:
+                            p = SendSample(project_number=project_number,
+                                           project_id=project_id,
+                                           sample_name='-'.join([row_dict['sample_name'], str(j+1)]),
+                                           om_id=om_id,
+                                           species=row_dict['species'],
+                                           express_number=row_dict['express_number'],
+                                           product_num=1,
+                                           create_time=row_dict['time'],
+                                           comment=row_dict['comment'],
+                                           upload_time=upload_time,
+                                           status='Y')
+                            p.save()
+                        except:
+                            SendSample.objects.filter(project_id=project_id, upload_time=upload_time).delete()
+                            return JsonResponse({'msg': u'数据格式错误!'})
+                else:
+                    om_num += 1
+                    om_id = ''.join([prefix, str(om_num)])
+                    try:
+                        p = SendSample(project_number=project_number,
+                                       project_id=project_id,
+                                       sample_name='-'.join([row_dict['sample_name'], str(j+1)]),
+                                       om_id=om_id,
+                                       species=row_dict['species'],
+                                       express_number=row_dict['express_number'],
+                                       product_num=row_dict['product_num'],
+                                       create_time=row_dict['time'],
+                                       comment=row_dict['comment'],
+                                       upload_time=upload_time,
+                                       status='Y')
+                        p.save()
+                    except:
+                        SendSample.objects.filter(project_id=project_id, upload_time=upload_time).delete()
+                        return JsonResponse({'msg': u'数据格式错误!'})
+            LogInfo(project_id=project_id, action='导入了样品信息表', time=datetime.datetime.now(), manager=username).save()         
             return JsonResponse({'msg': u'导入成功!'})
 
     elif table == 'quality_check':
@@ -118,21 +166,27 @@ def import_data(table, project_id, json_data, username):
             if update_data:
                 for row_dict in update_data:
                     QualityCheck.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
+            upload_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             for row_dict in json_data:
-                p = QualityCheck(project_id=project_id,
-                                 project_number=project_number,
-                                 sample_name=row_dict['sample_name'],
-                                 om_id=row_dict['om_id'],
-                                 sample_id=row_dict['sample_id'],
-                                 concentration=row_dict['concentration'],
-                                 volume=row_dict['volume'],
-                                 rin=row_dict['rin'],
-                                 results=row_dict['results'],
-                                 create_time=row_dict['time'],
-                                 comment=row_dict['comment'],
-                                 upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-                                 status='Y')
-                p.save()
+                try:
+                    p = QualityCheck(project_id=project_id,
+                                     project_number=project_number,
+                                     sample_name=row_dict['sample_name'],
+                                     om_id=row_dict['om_id'],
+                                     sample_id=row_dict['sample_id'],
+                                     concentration=row_dict['concentration'],
+                                     volume=row_dict['volume'],
+                                     rin=row_dict['rin'],
+                                     results=row_dict['results'],
+                                     create_time=row_dict['time'],
+                                     comment=row_dict['comment'],
+                                     upload_time=upload_time,
+                                     status='Y')
+                    p.save()
+                except:
+                    QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
+                    return JsonResponse({'msg': u'数据格式错误!'})
+                  
             LogInfo(project_id=project_id, action='导入了质检信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
@@ -146,18 +200,24 @@ def import_data(table, project_id, json_data, username):
             if update_data:
                 for row_dict in update_data:
                     BuildLib.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
-            for row_dict in json_data:
-                p = BuildLib(project_id=project_id,
-                             project_number=project_number,
-                             sample_name=row_dict['sample_name'],
-                             om_id=row_dict['om_id'],
-                             sample_id=row_dict['sample_id'],
-                             lib_id=row_dict['lib_id'],
-                             create_time=row_dict['time'],
-                             comment=row_dict['comment'],
-                             upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-                             status='Y')
-                p.save()
+            upload_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            try:
+                for row_dict in json_data:
+                    p = BuildLib(project_id=project_id,
+                                 project_number=project_number,
+                                 sample_name=row_dict['sample_name'],
+                                 om_id=row_dict['om_id'],
+                                 sample_id=row_dict['sample_id'],
+                                 lib_id=row_dict['lib_id'],
+                                 create_time=row_dict['time'],
+                                 comment=row_dict['comment'],
+                                 upload_time=upload_time,
+                                 status='Y')
+                    p.save()
+            except:
+                BuildLib.objects.filter(project_id=project_id, upload_time=upload_time).delete()
+                return JsonResponse({'msg': u'数据格式错误!'})
+              
             LogInfo(project_id=project_id, action='导入了建库信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
@@ -171,20 +231,26 @@ def import_data(table, project_id, json_data, username):
             if update_data:
                 for row_dict in update_data:
                     UpMachine.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
-            for row_dict in json_data:
-                p = UpMachine(project_id=project_id,
-                              project_number=project_number,
-                              sample_name=row_dict['sample_name'],
-                              om_id=row_dict['om_id'],
-                              sample_id=row_dict['sample_id'],
-                              upmachinetype=row_dict['upmachinetype'],
-                              mode=row_dict['mode'],
-                              data_count=row_dict['data_count'],
-                              create_time=row_dict['time'],
-                              comment=row_dict['comment'],
-                              upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-                              status='Y')
-                p.save()
+            upload_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            try:
+                for row_dict in json_data:
+                    p = UpMachine(project_id=project_id,
+                                  project_number=project_number,
+                                  sample_name=row_dict['sample_name'],
+                                  om_id=row_dict['om_id'],
+                                  sample_id=row_dict['sample_id'],
+                                  upmachinetype=row_dict['upmachinetype'],
+                                  mode=row_dict['mode'],
+                                  data_count=row_dict['data_count'],
+                                  create_time=row_dict['time'],
+                                  comment=row_dict['comment'],
+                                  upload_time=upload_time,
+                                  status='Y')
+                    p.save()
+            except:
+                UpMachine.objects.filter(project_id=project_id, upload_time=upload_time).delete()
+                return JsonResponse({'msg': u'数据格式错误!'})
+              
             LogInfo(project_id=project_id, action='导入了上机信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
@@ -198,20 +264,26 @@ def import_data(table, project_id, json_data, username):
             if update_data:
                 for row_dict in update_data:
                     DownMachine.objects.filter(om_id=row_dict['om_id'], status='Y').update(status='N')
-            for row_dict in json_data:
-                p = DownMachine(project_id=project_id,
-                                project_number=project_number,
-                                sample_name=row_dict['sample_name'],
-                                om_id=row_dict['om_id'],
-                                sample_id=row_dict['sample_id'],
-                                q20=row_dict['q20'],
-                                q30=row_dict['q30'],
-                                data_count=row_dict['data_count'],
-                                create_time=row_dict['time'],
-                                comment=row_dict['comment'],
-                                upload_time=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-                                status='Y')
-                p.save()
+            upload_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            try:
+                for row_dict in json_data:
+                    p = DownMachine(project_id=project_id,
+                                    project_number=project_number,
+                                    sample_name=row_dict['sample_name'],
+                                    om_id=row_dict['om_id'],
+                                    sample_id=row_dict['sample_id'],
+                                    q20=row_dict['q20'],
+                                    q30=row_dict['q30'],
+                                    data_count=row_dict['data_count'],
+                                    create_time=row_dict['time'],
+                                    comment=row_dict['comment'],
+                                    upload_time=upload_time,
+                                    status='Y')
+                    p.save()
+            except:
+                DownMachine.objects.filter(project_id=project_id, upload_time=upload_time).delete()
+                return JsonResponse({'msg': u'数据格式错误!'})
+              
             LogInfo(project_id=project_id, action='导入了下机信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:

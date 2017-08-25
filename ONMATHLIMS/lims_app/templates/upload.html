@@ -91,7 +91,7 @@
           $("#receive_sample").addClass("active");
       });
   */
-  var project_id = '{{ project_id }}';
+  var project_id = "{{ project_id }}";
   var table = "{{ table }}";
 
   var table_map  =  {'样品编号':'sample_id',
@@ -192,7 +192,7 @@
     }
     if(n.length != arr.length){
       alert('上传数据 omid 存在重复!');
-      return;
+      window.location.href = 'lims_app/upload_sample_info/?table={{table}}&proejct_id={{project_id}}';
     }
     return;
   }
