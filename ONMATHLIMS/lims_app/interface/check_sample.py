@@ -3,8 +3,7 @@
 import datetime
 from django.http import JsonResponse
 from django.db import connection
-from lims_app.models import SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, SampleProjectMaster,ReturnSample, LogInfo
-from ..import DbObjectDoesNotExist
+from lims_app.models import SendSample, QualityCheck, BuildLib, UpMachine, DownMachine, SampleProjectMaster, ReturnSample, LogInfo
 
 
 def get_db_data(cmd, get_all=True):
@@ -62,7 +61,7 @@ def split_data(table, project_id, json_data):
 
     return insert_data, update_data
 
-  
+
 def check_omid(table, project_id, om_ids):
     cmd = "select om_id from %s where project_id='%s'" % (table, project_id)
     results = get_db_data(cmd)
@@ -71,8 +70,8 @@ def check_omid(table, project_id, om_ids):
         if om_id not in results:
             return 'error'
     return 'ok'
-  
-  
+
+
 def import_data(table, project_id, json_data, username):
     project_number = SampleProjectMaster.objects.get(id=project_id).project_number
     if table == 'send_sample':
@@ -100,7 +99,7 @@ def import_data(table, project_id, json_data, username):
             except:
                 SendSample.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'数据格式错误!'})
-              
+
             LogInfo(project_id=project_id, action='更新了样品信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'更新成功!'})
         else:
@@ -156,7 +155,7 @@ def import_data(table, project_id, json_data, username):
                     except:
                         SendSample.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                         return JsonResponse({'msg': u'数据格式错误!'})
-            LogInfo(project_id=project_id, action='导入了样品信息表', time=datetime.datetime.now(), manager=username).save()         
+            LogInfo(project_id=project_id, action='导入了样品信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
 
     elif table == 'quality_check':
@@ -186,7 +185,7 @@ def import_data(table, project_id, json_data, username):
                 except:
                     QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                     return JsonResponse({'msg': u'数据格式错误!'})
-                  
+
             LogInfo(project_id=project_id, action='导入了质检信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
@@ -217,7 +216,7 @@ def import_data(table, project_id, json_data, username):
             except:
                 BuildLib.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'数据格式错误!'})
-              
+
             LogInfo(project_id=project_id, action='导入了建库信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
@@ -250,7 +249,7 @@ def import_data(table, project_id, json_data, username):
             except:
                 UpMachine.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'数据格式错误!'})
-              
+
             LogInfo(project_id=project_id, action='导入了上机信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
@@ -283,7 +282,7 @@ def import_data(table, project_id, json_data, username):
             except:
                 DownMachine.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'数据格式错误!'})
-              
+
             LogInfo(project_id=project_id, action='导入了下机信息表', time=datetime.datetime.now(), manager=username).save()
             return JsonResponse({'msg': u'导入成功!'})
         else:
@@ -392,7 +391,7 @@ def recover_data(table, upload_time, action, username, project_id=''):
 
 
 def split_return_sample(json_data):
-    cmd = "select om_id from %s where project_id='%s'" % (table, project_id)
+    cmd = "select om_id from return_sample"
     results = get_db_data(cmd)
     om_ids = []
     for row_dict in json_data:
@@ -415,13 +414,10 @@ def get_location():
     cmd = "select sample_id,location from return_sample where status = 'Y'"
     results = get_db_data(cmd)
     for sample_id, location in results:
-        try:
-            QualityCheck.objects.filter(sample_id=sample_id, status='Y').update(location=location)
-            BuildLib.objects.filter(sample_id=sample_id, status='Y').update(location=location)
-            UpMachine.objects.filter(sample_id=sample_id, status='Y').update(location=location)
-            DownMachine.objects.filter(sample_id=sample_id, status='Y').update(location=location)
-        except DbObjectDoesNotExist:
-            pass
+        QualityCheck.objects.filter(sample_id=sample_id, status='Y').update(location=location)
+        BuildLib.objects.filter(sample_id=sample_id, status='Y').update(location=location)
+        UpMachine.objects.filter(sample_id=sample_id, status='Y').update(location=location)
+        DownMachine.objects.filter(sample_id=sample_id, status='Y').update(location=location)
 
 
 def import_return_sample(json_data):
