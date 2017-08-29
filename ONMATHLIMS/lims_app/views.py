@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
 from models import *
 from interface import search_result_ini, get_sample_info, common, get_user_cost, check_sample
+from interface.common import get_projec_id_by_project_num, get_project_info
 sys.path.append('/usr/local/lib/python2.7/dist-packages')
 import django_excel as excel
 
@@ -18,7 +19,7 @@ import django_excel as excel
 reload(sys)
 sys.setdefaultencoding('utf8')
 os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
-title_map = {'wait_send': u'等待送样', 'send_sample':u'样品送样', 'quality_check': u'样品质检',
+title_map = {'wait_send': u'等待送样', 'send_sample': u'样品送样', 'quality_check': u'样品质检',
              'build_lib': u'样品建库', 'upmachine': u'样品上机', 'downmachine': u'样品下机'}
 
 flow_list = ['wait_send', 'send_sample', 'quality_check', 'build_lib', 'upmachine', 'downmachine']
@@ -55,6 +56,7 @@ def view_todo(request, table=None):
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
     all_attachment = common.get_attachment(project_id, table)
     all_upload_times = get_sample_info.get_upload_time(project_id=project_id, name=table)
+
     return (project_id, all_proj_info, sample_info, select_proj, all_attachment, all_upload_times)
 
 
@@ -280,6 +282,9 @@ def down_sample_info(request):
         elif table_name == 'downmachine':
             query_sets = DownMachine.objects.filter(project_number=project_number, status='Y')
             column_names = select_colums_dict.get('downmachine')
+        print 'query_sets: ', query_sets
+        print 'column_names: ', column_names
+        print 'file_name: ', project_number + title[table_name] + u'结果'
         return excel.make_response_from_query_sets(query_sets, column_names, 'xls', file_name=project_number + title[table_name] + u'结果')
     else:
         JsonResponse({'msg': 'error'})
@@ -306,14 +311,16 @@ def save_sample_row(request):
 
 
 def save_sample_table(request):
+    username = request.session.get('username', '')
     json_data = request.POST['sample_table_data']
     json_data = json.loads(json_data)
     project_id = request.POST.get('project_id', '')
     table_name = request.POST['table']
+
     if table_name == 'return_sample':
         response = check_sample.import_return_sample(json_data)
     else:
-        response = check_sample.import_data(table_name, project_id, json_data)
+        response = check_sample.import_data(table_name, project_id, json_data, username)
     return response
 
 
@@ -427,74 +434,94 @@ def show_expense_detail(request):
     return JsonResponse(data)
 
 
-def manage_expense_info(request):
+def manage_billing_info(request):
     if request.method == 'POST':
         oper = request.POST['oper']
-        if request.POST.get('billing_number'):
-            table_name = 'billing_info'
-        elif request.POST.get('sample_number'):
-            table_name = 'cost_info'
-        else:
-            table_name = 'receipt_info'
-
         if oper == 'del':
-            if table_name == 'billing_info':
-                BillingInfo.objects.filter(id=request.POST['id']).delete()
-            elif table_name == 'receipt_info':
-                ReceiptInfo.objects.filter(id=request.POST['id']).delete()
-            else:
-                CostInfo.objects.filter(id=request.POST['id']).delete()
-            return HttpResponse({'msg': 'ok'})
+            BillingInfo.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse({'msg': 'delete'})
         elif oper == 'add':
-            if table_name == 'billing_info':
-                new_row = BillingInfo(project_id=request.POST['project_id'],
-                                      project_number=request.POST['project_number'],
-                                      expense=request.POST['expense'],
-                                      billing_number=request.POST['billing_number'],
-                                      time=datetime.datetime.now(),
-                                      comment=request.POST['comment']
-                                      )
-            elif table_name == 'receipt_info':
-                new_row = ReceiptInfo(project_id=request.POST['project_id'],
-                                      project_number=request.POST['project_number'],
-                                      expense=request.POST['expense'],
-                                      time=datetime.datetime.now(),
-                                      comment=request.POST['comment'])
-            else:
-                new_row = CostInfo(project_id=request.POST['project_id'],
-                                   project_number=request.POST['project_number'],
-                                   expense=request.POST['expense'],
-                                   sample_number=request.POST['sample_number'],
-                                   unit_cost=request.POST['unit_cost'],
-                                   time=datetime.datetime.now(),
-                                   comment=request.POST['comment'])
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            new_row = BillingInfo(project_id=project_id,
+                                  project_number=request.POST['project_number'],
+                                  expense=request.POST['expense'],
+                                  billing_number=request.POST['billing_number'],
+                                  time=datetime.datetime.now(),
+                                  comment=request.POST['comment'])
             new_row.save()
-            return HttpResponse({'msg': 'ok'})
+            return HttpResponse({'msg': 'add'})
         else:
-            if table_name == 'billing_info':
-                BillingInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
-                                                                         billing_number=request.POST['billing_number'],
-                                                                         time=datetime.datetime.now(),
-                                                                         comment=request.POST['comment']
-                                                                         )
-            elif table_name == 'receipt_info':
-                ReceiptInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
-                                                                         time=datetime.datetime.now(),
-                                                                         comment=request.POST['comment'])
-            else:
-                CostInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
-                                                                      sample_number=request.POST['sample_number'],
-                                                                      unit_cost=request.POST['unit_cost'],
-                                                                      time=datetime.datetime.now(),
-                                                                      comment=request.POST['comment'])
-            return HttpResponse({'msg': 'ok'})
+            BillingInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                     billing_number=request.POST['billing_number'],
+                                                                     time=datetime.datetime.now(),
+                                                                     comment=request.POST['comment'])
+
+            return HttpResponse({'msg': 'update'})
+
+
+def manage_receipt_info(request):
+    if request.method == 'POST':
+        oper = request.POST['oper']
+        if oper == 'del':
+            ReceiptInfo.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse({'msg': 'delete'})
+        elif oper == 'add':
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            new_row = ReceiptInfo(project_id=project_id,
+                                  project_number=request.POST['project_number'],
+                                  expense=request.POST['expense'],
+                                  time=datetime.datetime.now(),
+                                  comment=request.POST['comment'])
+            new_row.save()
+            return HttpResponse({'msg': 'add'})
+        else:
+            ReceiptInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                     time=datetime.datetime.now(),
+                                                                     comment=request.POST['comment'])
+            return HttpResponse({'msg': 'update'})
+
+
+def manage_cost_info(request):
+    if request.method == 'POST':
+        oper = request.POST['oper']
+        if oper == 'del':
+            CostInfo.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse({'msg': 'delete'})
+        elif oper == 'add':
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            new_row = CostInfo(project_id=project_id,
+                               project_number=request.POST['project_number'],
+                               expense=request.POST['expense'],
+                               sample_number=request.POST['sample_number'],
+                               unit_cost=request.POST['unit_cost'],
+                               time=datetime.datetime.now(),
+                               comment=request.POST['comment'])
+            new_row.save()
+            return HttpResponse({'msg': 'add'})
+        else:
+            CostInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                  sample_number=request.POST['sample_number'],
+                                                                  unit_cost=request.POST['unit_cost'],
+                                                                  time=datetime.datetime.now(),
+                                                                  comment=request.POST['comment'])
+            return HttpResponse({'msg': 'update'})
 
 
 def recover_data(request):
+    username = request.session.get('username', '')
     table = request.GET.get('table', '')
     project_id = request.GET.get('project_id', '')
     upload_time = request.GET.get('upload_time', '')
     action = request.GET.get('action', '')
 
-    response = check_sample.recover_data(table, upload_time, action, project_id)
+    response = check_sample.recover_data(table, upload_time, action, username, project_id)
     return response
+
+
+def show_project_detail(request):
+    project_number = request.GET.get('project_number', '')
+    print 'project_number: ', project_number
+    project_id = get_projec_id_by_project_num(project_number)
+    info = get_project_info(project_id)
+
+    return render(request, 'project_detail.html', {'info': info})

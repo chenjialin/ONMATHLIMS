@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ project_number }}信息</title>
+</head>
+<body>
+    {% for n1, n2, n3 in info %}
+        {{ n3}}&nbsp; 于 &nbsp; {{ n2 }} &nbsp; {{ n1}}<br>
+    {% endfor %}
+</body>
+</html>
