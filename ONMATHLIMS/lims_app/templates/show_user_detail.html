@@ -207,9 +207,10 @@ $("#billing_table").jqGrid({
   sortname: 'expense',
   sortorder: 'desc',
   viewrecords: true,
-  editurl: '/lims_app/manage_expense_info/',
+  editurl: '/lims_app/manage_billing_info/',
   postData: {
-    user: "{{ cust_user }}"
+    user: "{{ cust_user }}",
+    table: "billing_info"
   },
   caption: '开票信息',
   width: 600
@@ -237,9 +238,10 @@ $("#receipt_table").jqGrid({
   sortname: 'expense',
   sortorder: 'desc',
   viewrecords: true,
-  editurl: '/lims_app/manage_expense_info/',
+  editurl: '/lims_app/manage_receipt_info/',
   postData: {
-    user: "{{ cust_user }}"
+    user: "{{ cust_user }}",
+    table: "receipt_info"
   },
   caption: '收款信息',
   width: 500
@@ -270,9 +272,10 @@ $("#cost_table").jqGrid({
   sortname: 'expense',
   sortorder: 'desc',
   viewrecords: true,
-  editurl: '/lims_app/manage_expense_info/',
+  editurl: '/lims_app/manage_cost_info/',
   postData: {
-    user: "{{ cust_user }}"
+    user: "{{ cust_user }}",
+    table: "cost_info"
   },
   caption: '成本信息',
   width: 700
