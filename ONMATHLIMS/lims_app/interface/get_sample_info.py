@@ -61,9 +61,9 @@ def get_user_id_by_name(username):
 
 def get_upload_time(project_id, name):
     if name == 'return_sample':
-        cmd = "select distinct upload_time,status from %s order by upload_time desc" % (name)
+        cmd = "select distinct upload_time,status from %s where status='Y' order by upload_time desc" % (name)
     else:
-        cmd = "select distinct upload_time,status from %s where project_id='%s' order by upload_time desc" % (name, project_id)
+        cmd = "select distinct upload_time,status from %s where project_id='%s' and status='Y' order by upload_time desc" % (name, project_id)
     cursor = connection.cursor()
     cursor.execute(cmd)
     results = cursor.fetchall()
@@ -77,5 +77,36 @@ def get_return_sample():
     cursor = connection.cursor()
     cursor.execute(cmd)
     results = cursor.fetchall()
+
+    return results
+
+
+def get_project_summary(project_id):
+    cmd = '''
+          select ss.sample_name,ss.sample_id,
+          ss.om_id,qc.results,um.data_count,
+          dm.data_count,um.location,rs.location from
+          send_sample ss inner join quality_check qc on
+          ss.sample_id=qc.sample_id inner join upmachine um on
+          qc.sample_id=um.sample_id inner join downmachine dm on
+          um.sample_id=dm.sample_id inner join return_sample rs on
+          dm.sample_id=rs.sample_id where ss.project_id='%s' and rs.status='Y';
+    ''' % (project_id)
+    cursor = connection.cursor()
+    cursor.execute(cmd)
+    results = cursor.fetchall()
+    if not results:
+        cmd = '''
+        select ss.sample_name,ss.sample_id,
+        ss.om_id,qc.results,um.data_count,
+        dm.data_count,um.location,ss.location from
+        send_sample ss inner join quality_check qc on
+        ss.sample_id=qc.sample_id inner join upmachine um on
+        qc.sample_id=um.sample_id inner join downmachine dm on
+        um.sample_id=dm.sample_id where ss.project_id='%s';
+        ''' % (project_id)
+        cursor = connection.cursor()
+        cursor.execute(cmd)
+        results = cursor.fetchall()
 
     return results

@@ -3,7 +3,7 @@ from django.db import connection
 
 
 def get_attachment(project_id, attachment_type):
-    cmd = """SELECT a.filename,a.upload_time,u.username
+    cmd = """SELECT a.id,a.filename,a.upload_time,a.comment,a.location,u.username
      FROM attachment a inner join user_info u on a.upload_user_id=u.id
      where project_id=%s and file_type='%s'""" % (project_id, attachment_type)
 
@@ -24,7 +24,7 @@ def get_projec_id_by_project_num(project_num):
 
 
 def get_project_info(project_id):
-    cmd = """SELECT action, time, manager FROM SEQ_SA_INFO.project_log_table where 
+    cmd = """SELECT action, time, manager FROM SEQ_SA_INFO.project_log_table where
       project_id=%s order by id desc limit 20""" % project_id
 
     cursor = connection.cursor()

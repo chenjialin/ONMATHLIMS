@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^logout/', views.logout, name='logout'),
     url(r'^search/', views.search, name='search'),
     url(r'^save_sample_info', views.save_sample_info, name='save_sample_info'),
+    url(r'^save_upload_info', views.save_upload_info, name='save_upload_info'),
     url(r'^down_sample_info/', views.down_sample_info, name='down_sample_info'),
     url(r'^operation_log/', views.operation_log, name='operation_log'),
     url(r'^quality_check/', views.quality_check, name='quality_check'),

@@ -8,10 +8,11 @@ function pageInit(){
       datatype : 'local',
       height: 450,
       // height: 'auto',
-      colNames: ['样品名称', 'OMID', '物种', '快递编号', '管数', '时间', '备注'],
+      colNames: ['样品名称', 'OMID', '样品编号', '物种', '快递编号', '管数', '时间', '备注'],
       colModel: [
             { name: 'sample_name', index: 'sample_name', editable: true, width: 60},
             { name: 'om_id', index: 'om_id', editable: true, width: 60},
+            { name: 'sample_id', index: 'sample_id', editable: true, width: 60},
             { name: 'species', index: 'species', editable: true, width: 60},
             { name: 'express_number', index: 'express_number', editable: true, width: 60},
             { name: 'product_num', index: 'product_num', editable: true, width: 60},
