@@ -85,18 +85,19 @@ def get_project_summary(project_id):
     cmd = '''
           select ss.sample_name,ss.sample_id,
           ss.om_id,qc.results,um.data_count,
-          dm.data_count,um.location,rs.location from
+          dm.data_count,ss.location,um.location from
           send_sample ss inner join quality_check qc on
           ss.sample_id=qc.sample_id inner join upmachine um on
           qc.sample_id=um.sample_id inner join downmachine dm on
-          um.sample_id=dm.sample_id inner join return_sample rs on
-          dm.sample_id=rs.sample_id where ss.project_id='%s' and rs.status='Y';
+          um.sample_id=dm.sample_id
+          where ss.project_id='%s';
     ''' % (project_id)
     cursor = connection.cursor()
     cursor.execute(cmd)
     results = cursor.fetchall()
+    '''
     if not results:
-        cmd = '''
+        cmd =
         select ss.sample_name,ss.sample_id,
         ss.om_id,qc.results,um.data_count,
         dm.data_count,um.location,ss.location from
@@ -104,9 +105,9 @@ def get_project_summary(project_id):
         ss.sample_id=qc.sample_id inner join upmachine um on
         qc.sample_id=um.sample_id inner join downmachine dm on
         um.sample_id=dm.sample_id where ss.project_id='%s';
-        ''' % (project_id)
+         % (project_id)
         cursor = connection.cursor()
         cursor.execute(cmd)
         results = cursor.fetchall()
-
+    '''
     return results

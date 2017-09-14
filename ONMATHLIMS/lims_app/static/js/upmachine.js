@@ -8,7 +8,7 @@ function pageInit(){
       datatype : 'local',
       height: 500,
       // height: 'auto',
-      colNames: ['样品名称', 'OMID', '样品编号', '上机类型', '上机模式', '数据量', '时间', '备注'],
+      colNames: ['样品名称', 'OMID', '样品编号', '上机类型', '上机模式', '数据量', '时间', '所在地', '备注'],
       colModel: [
             { name: 'sample_name', index: 'sample_name', editable: true, width: 60},
             { name: 'om_id', index: 'om_id', editable: true, width: 60},
@@ -17,6 +17,7 @@ function pageInit(){
             { name: 'mode', index: 'mode', editable: true, width: 60},
             { name: 'data_count', index: 'data_count', editable: true, width: 60},
             { name: 'time', index: 'time', editable: true, width: 60},
+            { name: 'location', index: 'location', editable: true, width: 60},
             { name: 'comment', index: 'comment', editable: true, width: 60}
           ],
       gridComplete: function() {},

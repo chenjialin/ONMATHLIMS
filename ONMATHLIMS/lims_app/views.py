@@ -346,8 +346,16 @@ def save_sample_table(request):
 
     if table_name == 'return_sample':
         response = check_sample.import_return_sample(json_data)
-    else:
-        response = check_sample.import_data(table_name, project_id, json_data, username)
+    elif table_name == 'send_sample':
+        response = check_sample.import_send_sample(project_id, json_data, username)
+    elif table_name == 'quality_check':
+        response = check_sample.import_quality_check(project_id, json_data, username)
+    elif table_name == 'build_lib':
+        response = check_sample.import_build_lib(project_id, json_data, username)
+    elif table_name == 'upmachine':
+        response = check_sample.import_upmachine(project_id, json_data, username)
+    elif table_name == 'downmachine':
+        response = check_sample.import_downmachine(project_id, json_data, username)
     return response
 
 
