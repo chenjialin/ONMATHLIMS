@@ -4,14 +4,15 @@ import os
 import sys
 import json
 import datetime
-from . import DbObjectDoesNotExist, select_colums_dict
+from models import *
+from . import select_colums_dict
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from forms import SampleProjectMasterForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
-from models import *
 from interface import search_result_ini, get_sample_info, common, get_user_cost, check_sample
 from interface.common import get_projec_id_by_project_num, get_project_info
+# for import django excel
 sys.path.append('/usr/local/lib/python2.7/dist-packages')
 import django_excel as excel
 
