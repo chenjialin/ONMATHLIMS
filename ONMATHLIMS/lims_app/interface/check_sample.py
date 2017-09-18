@@ -173,6 +173,7 @@ def import_send_sample(project_id, json_data, username):
                                product_num=row_dict['product_num'],
                                create_time=row_dict['time'],
                                comment=row_dict['comment'],
+                               location=row_dict['location'],
                                upload_time=upload_time,
                                status='Y')
                 p.save()
@@ -208,6 +209,7 @@ def import_send_sample(project_id, json_data, username):
                                product_num=row_dict['product_num'],
                                create_time=row_dict['time'],
                                comment=row_dict['comment'],
+                               location=row_dict['location'],
                                upload_time=upload_time,
                                status='Y')
                 p.save()
@@ -280,7 +282,7 @@ def import_quality_check(project_id, json_data, username):
             except KeyError:
                 QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'没有找到{0}!'.format(row_dict['sample_id'])})
-            except ValueError:
+            except:
                 QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'数据格式错误(时间格式)!'})
 
@@ -344,7 +346,7 @@ def import_build_lib(project_id, json_data, username):
             except KeyError:
                 QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'没有找到{0}!'.format(row_dict['sample_id'])})
-            except ValueError:
+            except:
                 QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'数据格式错误(时间格式)!'})
         LogInfo(project_id=project_id, action='导入了建库信息表', time=datetime.datetime.now(), manager=username).save()
@@ -411,7 +413,7 @@ def import_upmachine(project_id, json_data, username):
                 except KeyError:
                     QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                     return JsonResponse({'msg': u'没有找到{0}!'.format(row_dict['sample_id'])})
-                except ValueError:
+                except:
                     QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                     return JsonResponse({'msg': u'数据格式错误(时间格式)!'})
             LogInfo(project_id=project_id, action='导入了上机信息表', time=datetime.datetime.now(), manager=username).save()
@@ -446,7 +448,7 @@ def import_upmachine(project_id, json_data, username):
                 except KeyError:
                     QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                     return JsonResponse({'msg': u'没有找到{0}!'.format(row_dict['sample_id'])})
-                except ValueError:
+                except:
                     QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                     return JsonResponse({'msg': u'数据格式错误(时间格式)!'})
             LogInfo(project_id=project_id, action='导入了上机信息表', time=datetime.datetime.now(), manager=username).save()
@@ -513,7 +515,7 @@ def import_downmachine(project_id, json_data, username):
             except KeyError:
                 QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'没有找到{0}!'.format(row_dict['sample_id'])})
-            except ValueError:
+            except:
                 QualityCheck.objects.filter(project_id=project_id, upload_time=upload_time).delete()
                 return JsonResponse({'msg': u'数据格式错误(时间格式)!'})
         LogInfo(project_id=project_id, action='导入了下机信息表', time=datetime.datetime.now(), manager=username).save()

@@ -22,6 +22,11 @@
   <link rel="stylesheet" href="{% static "dist/css/skins/_all-skins.min.css" %}">
   <!-- DataTables -->
   <link rel="stylesheet" href="{% static "plugins/datatables/dataTables.bootstrap.css" %}">
+  <style>
+  .highlight {
+    background-color: red;
+  }
+  </style>
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -152,6 +157,7 @@
                   {% endfor  %}
                 </tbody>
               </table>
+              <button type="submit" class="btn btn-default" onclick="down_summary_table()">下载项目总览信息</button>
             </div>
             <div class="box-body">
               <h3 class="box-title">项目计费信息:</h3><br>
@@ -209,7 +215,21 @@
 <script src="{%  static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
 <script src="{%  static "plugins/datatables/dataTables.bootstrap.js" %}"></script>
 <script>
-var table = $("#sample_table").DataTable()
+$(document).ready(function(){
+  $("sample_table").find("tr").each(function(){
+    var tdArr = $(this).children();
+    var upmachine_data = tdArr.eq(5).val();
+    var downmachine_data = tdArr.eq(6).val();
+    if(upmachine_data > downmachine_data){
+      $(this).addClass('highlight');
+    }
+  });
+});
+var project_number = '{{ project_number }}';
+var table = $("#sample_table").DataTable();
+function down_summary_table(table) {
+  window.location.href = '/lims_app/download_summary_info?project_number=' + project_number;
+}
 </script>
 </body>
 </html>

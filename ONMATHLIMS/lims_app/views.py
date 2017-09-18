@@ -621,3 +621,16 @@ def show_project_detail(request):
                                                    'exp_dict': exp_dict,
                                                    'project_number': project_number,
                                                    'project_info': project_info})
+
+
+def download_summary_info(request):
+    project_number = request.GET.get('project_number', '')
+    project_id = get_projec_id_by_project_num(project_number)
+    file_path = get_sample_info.download_summary_table(project_id)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=%s' % os.path.basename(file_path)
+            return response
+
+    raise Http404

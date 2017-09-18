@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^show_user_detail/', views.show_user_detail, name='show_user_detail'),
     url(r'^show_expense_detail/', views.show_expense_detail, name='show_expense_detail'),
     url(r'^download_expense_info/', views.down_expense_info, name='down_expense_info'),
+    url(r'^download_summary_info/', views.download_summary_info, name='download_summary_info'),
     url(r'^manage_billing_info/', views.manage_billing_info, name='manage_billing_info'),
     url(r'^manage_receipt_info/', views.manage_receipt_info, name='manage_receipt_info'),
     url(r'^manage_cost_info/', views.manage_cost_info, name='manage_cost_info'),
