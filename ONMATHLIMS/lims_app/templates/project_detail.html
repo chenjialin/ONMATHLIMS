@@ -1,12 +1,237 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>{{ project_number }}信息</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>{{ project_number }}信息</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.6 -->
+  {% load staticfiles %}
+  <link rel="stylesheet" href="{% static "css/ui.jqgrid.css" %}" />
+  <link rel="stylesheet" href="{% static "css/jquery-ui-1.8.16.custom.css" %}" />
+  <link rel="stylesheet" href="{% static "bootstrap/css/bootstrap.min.css" %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static "css/font-awesome.min.css" %}">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="{% static "css/ionicons.min.css" %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static "dist/css/AdminLTE.min.css" %}">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="{% static "dist/css/skins/_all-skins.min.css" %}">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static "plugins/datatables/dataTables.bootstrap.css" %}">
+  <style>
+  .highlight {
+    background-color: red;
+  }
+  </style>
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+  <script src="static/js/html5shiv.min.js"></script>
+  <script src="static/js/respond.min.js"></script>
+  <![endif]-->
 </head>
-<body>
-    {% for n1, n2, n3 in info %}
-        {{ n3}}&nbsp; 于 &nbsp; {{ n2 }} &nbsp; {{ n1}}<br>
-    {% endfor %}
+<!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+
+  <header class="main-header">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a href="/lims_app/main" class="navbar-brand">ONMATHLIMS</a>
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+            <i class="fa fa-bars"></i>
+          </button>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <!--
+          <form class="navbar-form navbar-left" role="search" method="get" action="/lims_app/search?">
+            <div class="form-group">
+              <input type="text" name="q" class="form-control" id="navbar-search-input" placeholder="回车进行搜索" value="{{ key_word }}">
+            </div>
+          </form>
+        -->
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+        <div class="navbar-custom-menu">
+          <ul class="nav navbar-nav">
+            <!-- User Account Menu -->
+            <li class="dropdown user user-menu">
+              <!-- Menu Toggle Button -->
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <!-- The user image in the navbar-->
+                <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="user-image" alt="User Image">
+                <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                <span class="hidden-xs">{{ username }}</span>
+              </a>
+              <ul class="dropdown-menu">
+                <!-- The user image in the menu -->
+                <li class="user-header">
+                  <img src="{% static 'dist/img/user2-160x160.jpg' %}" class="img-circle" alt="User Image">
+                  <p>{{ username }}</p>
+                </li>
+                <!-- Menu Footer-->
+                <li class="user-footer">
+                  <div class="pull-left">
+                    <a href="#" class="btn btn-default btn-flat">Profile</a>
+                  </div>
+                  <div class="pull-right">
+                      <a href="{% url "logout" %}" class="btn btn-default btn-flat">Sign out</a>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-custom-menu -->
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <div class="content-wrapper">
+    <div class="container">
+      <!-- Content Header (Page header) -->
+      <!--
+      <section class="content-header">
+        <ol class="breadcrumb">
+          <li><a href="/lims_app/main"><i class="fa fa-dashboard"></i> Home</a></li>
+          <li class="active">搜索</li>
+        </ol>
+      </section>
+    -->
+      <!-- Main content -->
+      <section class="content">
+      <div class="box box-solid bg-teal-gradient">
+            <div class="box-header">
+              <i class="fa fa-th"></i>
+              <h3 class="box-title">提示!</h3>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                <button type="button" class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body border-radius-none">
+              <div class="chart" id="line-chart" style="height: 10px;"></div>
+                <p>详情1.0功能目前支持显示开票信息/收款信息/成本信息和判定当前项目客户是否欠费,同时显示管理员对这个项目的操作详情。
+                </p>
+            </div>
+            <!-- /.box-footer -->
+        </div>
+        <div class="row">
+        <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">项目总览</h3>
+              <table class="table table-responsive no-padding" id="sample_table">
+                <thead>
+                  <tr>
+                      <th>样品名称</th>
+                      <th>样品编号</th>
+                      <th>OMID</th>
+                      <th>质检结果</th>
+                      <th>上机数据量</th>
+                      <th>下机数据量</th>
+                      <th>样品所在地</th>
+                      <th>项目所在地</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for n1,n2,n3,n4,n5,n6,n7,n8 in project_info %}
+                      <tr>
+                          <td>{{ n1 }}</td>
+                          <td>{{ n2 }}</td>
+                          <td>{{ n3 }}</td>
+                          <td>{{ n4 }}</td>
+                          <td>{{ n5 }}</td>
+                          <td>{{ n6 }}</td>
+                          <td>{{ n7 }}</td>
+                          <td>{{ n8 }}</td>
+                      </tr>
+                  {% endfor  %}
+                </tbody>
+              </table>
+              <button type="submit" class="btn btn-default" onclick="down_summary_table()">下载项目总览信息</button>
+            </div>
+            <div class="box-body">
+              <h3 class="box-title">项目计费信息:</h3><br>
+              开票费用: {{ exp_dict.billing_info }}<br>
+              已收费用：{{ exp_dict.receipt_info }}<br>
+              成本费用: {{ exp_dict.cost_info }}<br>
+              {% if exp_dict.status == 'bad' %}
+              <p style="color:red">该用户已经存在欠款!</p>
+              {% endif %}
+              <h3 class="box-title">更新信息:</h3><br>
+              {% for n1, n2, n3 in info %}
+                  {{ n3}}&nbsp; 于 &nbsp; {{ n2 }} &nbsp; {{ n1}}<br>
+              {% endfor %}
+            </div>
+            <!-- /.box-body -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+
+        <!-- /.box -->
+      </section>
+      <!-- /.content -->
+    </div>
+  </div>
+  <!-- /.content-wrapper -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="pull-right hidden-xs">
+        <b>Version</b> 1.0.0
+      </div>
+      <strong>Copyright &copy; 2014-2017 <a href="http://www.onmath.com">OnMath</a>.</strong> All rights
+      reserved.
+    </div>
+    <!-- /.container -->
+  </footer>
+</div>
+<!-- ./wrapper -->
+
+<!-- jQuery 3.1.1 -->
+<script src="{%  static "plugins/jQuery/jquery-3.1.1.min.js" %}"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="{%  static "bootstrap/js/bootstrap.min.js" %}"></script>
+<!-- SlimScroll -->
+<script src="{%  static "plugins/slimScroll/jquery.slimscroll.min.js" %}"></script>
+<!-- FastClick -->
+<script src="{%  static "plugins/fastclick/fastclick.js" %}"></script>
+<!-- AdminLTE App -->
+<script src="{%  static "dist/js/adminlte.min.js" %}"></script>
+<!-- AdminLTE for demo purposes -->
+<script src="{%  static "dist/js/demo.js" %}"></script>
+<script src="{%  static "js/jquery.jqGrid.src.js" %}"></script>
+<script src="{%  static "js/grid.locale-cn.js" %}"></script>
+<script src="{%  static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
+<script src="{%  static "plugins/datatables/dataTables.bootstrap.js" %}"></script>
+<script>
+$(document).ready(function(){
+  $("#sample_table > tbody tr").each(function(){
+    var tdArr = $(this).children();
+    var upmachine_data =tdArr.eq(4).text();
+    var downmachine_data = tdArr.eq(5).text();
+    upmachine_data = Number(upmachine_data);
+    downmachine_data = Number(downmachine_data.split('G')[0]);
+    if(upmachine_data > downmachine_data){
+      $(this).addClass('highlight');
+    }
+  });
+});
+var project_number = '{{ project_number }}';
+var table = $("#sample_table").DataTable();
+function down_summary_table(table) {
+  window.location.href = '/lims_app/download_summary_info?project_number=' + project_number;
+}
+</script>
 </body>
 </html>

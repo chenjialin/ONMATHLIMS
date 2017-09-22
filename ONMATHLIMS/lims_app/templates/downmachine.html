@@ -73,7 +73,7 @@
                             <td>{{ n9 }}</td>
                             <td>{{ n10 | date:"Y年m月d日 H时i分"}}</td>
                             <td><a href="#" id="sample_id_{{ n1 }}" class="username" data-type="text">{{ n11 }}</a></td>
-                            <td>{{ n12 }}<td>
+                            <td>{{ n12 }}</td>
                             <td>{{ n13 }}</td>
                         </tr>
                     {% endfor  %}
@@ -97,11 +97,7 @@
                       {% for n1,n2 in all_upload_times %}
                           <tr>
                               <td>{{ n1 }}</td>
-                              {% if n2 == 'N' %}
-                              <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">重置</button></td>
-                              {% else %}
                               <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">删除</button></td>
-                              {% endif %}
                           </tr>
                       {% endfor %}
                     </tbody>
@@ -124,15 +120,17 @@
 
               <table class="table table-bordered table-condensed">
                     <thead>
-                        <tr><th>文件名称</th><th>上传时间</th><th>用户名称</th><th>操作</th></tr>
+                        <tr><th>文件名称</th><th>上传时间</th><th>备注</th><th>所在地</th><th>操作人员</th><th>操作</th></tr>
                     </thead>
                     <tbody id="project_files">
-                        {% for n1,n2,n3 in all_attachment %}
+                        {% for n1,n2,n3,n4,n5,n6 in all_attachment %}
                             <tr>
-                                <td><a href='/lims_app/static/attachment/{{ project_id }}/receive_sample/{{ n1 }}'>{{ n1 }}</a></td>
-                                <td>{{ n2 }}</td>
-                                <td>{{ n3 }}</td>
-                                <td><button onclick="delete_attachment(this, '{{ n1 }}')">删除</button></td>
+                                <td><a href='/lims_app/static/attachment/{{ project_id }}/receive_sample/{{ n2 }}'>{{ n2 }}</a></td>
+                                <td>{{ n3 | date:"Y年m月d日" }}</td>
+                                <td><a href="#" id="sample_id_{{ n1 }}" class="comment" data-type="text">{{ n4 }}</a></td>
+                                <td><a href="#" id="sample_id_{{ n1 }}" class="location" data-type="text">{{ n5 }}</a></td>
+                                <td>{{ n6 }}</td>
+                                <td><button onclick="delete_attachment(this, '{{ n2 }}')">删除</button></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -185,13 +183,37 @@
       }
     }
     $(function () {
-        $('#downmachine_table').DataTable();
+        $('#downmachine_table').DataTable({
+          "fnRowCallback":function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
+            $('.username').editable({
+               url: '/lims_app/save_sample_info?table=downmachine',
+               type: 'text',
+               pk: 1,
+               name: this.id,
+               title: '添加备注',
+            });
+          }
+        });
         $('.username').editable({
            url: '/lims_app/save_sample_info?table=downmachine',
            type: 'text',
            pk: 1,
            name: this.id,
            title: '添加备注',
+        });
+        $('.comment').editable({
+           url: '/lims_app/save_upload_info?table=upmachine&field=comment',
+           type: 'text',
+           pk: 1,
+           name: this.id,
+           title: '添加备注',
+        });
+        $('.location').editable({
+           url: '/lims_app/save_upload_info?table=upmachine&field=location',
+           type: 'text',
+           pk: 1,
+           name: this.id,
+           title: '添加所在地',
         });
         $("#downmachine").addClass('active');
     });
@@ -204,13 +226,8 @@
         })
     }
     function recover_data(obj, upload_time, status) {
-      if(status == 'Y'){
-        action = 'delete';
-      }else{
-        action = 'recover';
-      }
       ajaxSend('/lims_app/recover_data', {'upload_time': upload_time,
-            'project_id': project_id, 'table': 'downmachine', 'action': action},function(data){
+            'project_id': project_id, 'table': 'downmachine'},function(data){
               alert(data.msg);
               obj.parentNode.parentNode.remove();
               window.location.href = "/lims_app/downmachine/?project_id=" + project_id;
