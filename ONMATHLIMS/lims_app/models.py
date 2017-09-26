@@ -156,6 +156,7 @@ class SampleProjectMaster(models.Model):
     species = models.CharField(max_length=45, blank=True, null=True)
     project_leader = models.CharField(max_length=45, blank=True, null=True)
     status = models.CharField(max_length=45, blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
     created_by = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.CharField(max_length=45, blank=True, null=True)
     #project_log = models.TextField(blank=True, null=True)
@@ -243,14 +244,14 @@ class UserInfo(models.Model):
 
 
 class Attachment(models.Model):
-    # id = models.AutoField(primary_key=True)
-    # id = models.IntegerField(primary_key=True)
     project_id = models.IntegerField()
     upload_user_id = models.IntegerField()
     operate_user_id = models.IntegerField()
     file_type = models.CharField(max_length=45, blank=True, null=True)
     filename = models.CharField(max_length=200, blank=True, null=True)
     file_path = models.CharField(max_length=200, blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
     status = models.CharField(max_length=45, blank=True, null=True)
     upload_time = models.DateTimeField(blank=True, null=True)
 
@@ -263,6 +264,7 @@ class SendSample(models.Model):
     project_id = models.IntegerField()
     project_number = models.CharField(max_length=45, unique=True)
     sample_name = models.CharField(max_length=45)
+    sample_id = models.CharField(max_length=45, unique=True)
     species = models.CharField(max_length=45)
     om_id = models.CharField(max_length=100)
     express_number = models.CharField(max_length=45, blank=True, null=True)
@@ -270,6 +272,7 @@ class SendSample(models.Model):
     create_time = models.DateTimeField(blank=True, null=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
     upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
     status = models.CharField(max_length=1, blank=True, null=True)
 
     class Meta:
@@ -409,6 +412,7 @@ class LogInfo(models.Model):
 
 class ReturnSample(models.Model):
     sample_name = models.CharField(max_length=45)
+    # om_id = models.CharField(max_length=100)
     sample_id = models.CharField(max_length=45)
     location = models.CharField(max_length=100)
     time = models.DateTimeField(blank=True, null=True)
@@ -419,4 +423,3 @@ class ReturnSample(models.Model):
     class Meta:
         managed = False
         db_table = 'return_sample'
-

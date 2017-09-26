@@ -5,7 +5,7 @@ import datetime
 from math import ceil
 from openpyxl import Workbook
 from django.db import connection
-
+from ..models import BillingInfo, CostInfo, ReceiptInfo
 '''
 deal with user cost functions
 '''
@@ -71,17 +71,41 @@ def get_expense_info(user, limit, sidx, sord, page, table):
     return page, total_pages, count, results
 
 
-def get_expense_total(user, table):
-    cmd = cmd_dict[table] % (user)
+def get_expense_total(user, table, project_id=''):
+    if not project_id:
+        cmd = cmd_dict[table] % (user)
+    else:
+        cmd = cmd_dict[table] % (user)
+        cmd = cmd + " and project_id='%s'" % (project_id)
+    # print cmd
     cursor = connection.cursor()
     cursor.execute(cmd)
 
     results = cursor.fetchall()
     total_expense = 0
-    for result in results:
-        total_expense += result[3]
+    if results:
+        for result in results:
+            total_expense += result[3]
+        return total_expense
+    else:
+        return total_expense
 
-    return total_expense
+
+def check_bill(user, project_id):
+    bi_exp = get_expense_total(user, 'billing_info', project_id)
+    re_exp = get_expense_total(user, 'receipt_info', project_id)
+    co_exp = get_expense_total(user, 'cost_info', project_id)
+
+    exp_dict = {'billing_info': bi_exp,
+                'receipt_info': re_exp,
+                'cost_info': co_exp}
+    if bi_exp == re_exp == co_exp == 0:
+        exp_dict.update({'status': 'ok'})
+    elif bi_exp > co_exp and re_exp >= bi_exp * 0.6 and re_exp > co_exp:
+        exp_dict.update({'status': 'ok'})
+    else:
+        exp_dict.update({'status': 'bad'})
+    return exp_dict
 
 
 def down_expense_table(user, table):

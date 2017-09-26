@@ -87,11 +87,7 @@
                       {% for n1,n2 in all_upload_times %}
                           <tr>
                               <td>{{ n1 }}</td>
-                              {% if n2 == 'N' %}
-                              <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">重置</button></td>
-                              {% else %}
                               <td><button onclick="recover_data(this, '{{ n1 }}', '{{ n2 }}')">删除</button></td>
-                              {% endif %}
                           </tr>
                       {% endfor %}
                     </tbody>
@@ -174,7 +170,17 @@
       }
     }
     $(function(){
-        $('#quality_check_table').DataTable();
+        $('#quality_check_table').DataTable({
+          "fnRowCallback":function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
+            $('.username').editable({
+               url: '/lims_app/save_sample_info?table=quality_check',
+               type: 'text',
+               pk: 1,
+               name: this.id,
+               title: '添加备注',
+            });
+          }
+        });
         $('.username').editable({
            url: '/lims_app/save_sample_info?table=quality_check',
            type: 'text',
@@ -193,13 +199,8 @@
         })
     }
     function recover_data(obj, upload_time, status) {
-      if(status == 'Y'){
-        action = 'delete';
-      }else{
-        action = 'recover';
-      }
       ajaxSend('/lims_app/recover_data', {'upload_time': upload_time,
-            'project_id': project_id, 'table': 'quality_check', 'action': action},function(data){
+            'project_id': project_id, 'table': 'quality_check'},function(data){
               alert(data.msg);
               obj.parentNode.parentNode.remove();
               window.location.href = "/lims_app/quality_check/?project_id=" + project_id;

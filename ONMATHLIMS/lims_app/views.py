@@ -4,14 +4,15 @@ import os
 import sys
 import json
 import datetime
-from . import DbObjectDoesNotExist, select_colums_dict
+from models import *
+from . import select_colums_dict
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from forms import SampleProjectMasterForm
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, redirect
-from models import *
 from interface import search_result_ini, get_sample_info, common, get_user_cost, check_sample
 from interface.common import get_projec_id_by_project_num, get_project_info
+# for import django excel
 sys.path.append('/usr/local/lib/python2.7/dist-packages')
 import django_excel as excel
 
@@ -22,7 +23,7 @@ os.environ['NLS_LANG'] = 'SIMPLIFIED CHINESE_CHINA.UTF8'
 title_map = {'wait_send': u'等待送样', 'send_sample': u'样品送样', 'quality_check': u'样品质检',
              'build_lib': u'样品建库', 'upmachine': u'样品上机', 'downmachine': u'样品下机'}
 
-flow_list = ['wait_send', 'send_sample', 'quality_check', 'build_lib', 'upmachine', 'downmachine']
+flow_list = [u'等待送样', u'样品送样', u'样品质检', u'样品建库', u'样品上机', u'样品下机']
 # Create your views here.
 CODE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -41,18 +42,22 @@ def login_required(func):
     return _decorator
 
 
+'''
 def change_status(project_id, table_name):
     status = SampleProjectMaster.objects.get(id=project_id).status
     if flow_list.index(status) < flow_list.index(table_name):
         SampleProjectMaster.objects.filter(id=project_id).update(status=table_name)
+'''
 
 
 def view_todo(request, table=None):
     project_id = request.GET.get('project_id', '') or 0
     all_proj_info = get_sample_info.get_all_proj_info()
     sample_info = get_sample_info.get_sample_by_project(project_id, name=table)
+    '''
     if sample_info:
         change_status(project_id=project_id, table_name=table)
+    '''
     select_proj = get_sample_info.get_proj_name_by_id(project_id)
     all_attachment = common.get_attachment(project_id, table)
     all_upload_times = get_sample_info.get_upload_time(project_id=project_id, name=table)
@@ -122,7 +127,8 @@ def show_project_master(request):
             project_dict = {}
             project_dict['project_number'] = each_project.project_number
             project_dict['create_time'] = each_project.create_time.split(" ")[0]
-            #project_dict['status'] = title_map.get(each_project.status)
+            project_dict['status'] = title_map.get(each_project.status)
+            project_dict['comment'] = each_project.comment
             project_dict['cust_user'] = each_project.cust_user
             all_projects_list.append(project_dict)
         return JsonResponse({'data': all_projects_list})
@@ -136,8 +142,19 @@ def main(request):
         key_word = request.GET.get('q')
         return redirect('/lims_app/search?q=%s' % key_word)
 
+    all_projects = SampleProjectMaster.objects.all()
+    all_projects_list = []
+    for each_project in all_projects:
+        project_dict = {}
+        project_dict['project_number'] = each_project.project_number
+        project_dict['create_time'] = each_project.create_time.split(" ")[0]
+        project_dict['status'] = title_map.get(each_project.status)
+        project_dict['comment'] = each_project.comment
+        project_dict['cust_user'] = each_project.cust_user
+        all_projects_list.append(project_dict)
+
     return render(request, os.path.join(CODE_ROOT, 'lims_app/templates', 'index.html'),
-                      {'username': username})
+                      {'username': username, 'all_projects': all_projects_list})
 
 
 @login_required
@@ -243,6 +260,7 @@ def return_sample(request):
 
 def save_sample_info(request):
     table_name = request.GET.get('table')
+    field = request.GET.get('field')
     sample_id = request.POST['name']
     value = request.POST['value']
     if table_name == 'send_sample':
@@ -257,6 +275,16 @@ def save_sample_info(request):
         DownMachine.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
     elif table_name == 'return_sample':
         ReturnSample.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
+    elif table_name == 'project_info':
+        if field == 'comment':
+            SampleProjectMaster.objects.filter(project_number=sample_id).update(comment=value)
+        elif field == 'status':
+            SampleProjectMaster.objects.filter(project_number=sample_id).update(status=value)
+        else:
+            return JsonResponse({'msg': 'error'})
+    else:
+        return JsonResponse({'msg': 'error'})
+
     return JsonResponse({'msg': 'ok'})
 
 
@@ -319,8 +347,16 @@ def save_sample_table(request):
 
     if table_name == 'return_sample':
         response = check_sample.import_return_sample(json_data)
-    else:
-        response = check_sample.import_data(table_name, project_id, json_data, username)
+    elif table_name == 'send_sample':
+        response = check_sample.import_send_sample(project_id, json_data, username)
+    elif table_name == 'quality_check':
+        response = check_sample.import_quality_check(project_id, json_data, username)
+    elif table_name == 'build_lib':
+        response = check_sample.import_build_lib(project_id, json_data, username)
+    elif table_name == 'upmachine':
+        response = check_sample.import_upmachine(project_id, json_data, username)
+    elif table_name == 'downmachine':
+        response = check_sample.import_downmachine(project_id, json_data, username)
     return response
 
 
@@ -365,6 +401,8 @@ def upload_attachment(request):
                file_type=file_type,
                filename=file_name,
                file_path=full_file_name,
+               comment='',
+               location='',
                status='new',
                upload_time=datetime.datetime.now()
                ).save()
@@ -379,6 +417,33 @@ def delete_attachment(request):
     Attachment.objects.filter(project_id=project_id, filename=file_name, file_type=file_type).delete()
 
     return HttpResponse(json.dumps({"ret": True}))
+
+
+def save_upload_info(request):
+    table = request.GET.get('table')
+    field = request.GET.get('field')
+    sample_id = request.POST['name']
+    value = request.POST['value']
+    if table == 'upmachine':
+        if field == 'comment':
+            Attachment.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=value)
+            return JsonResponse({'msg': 'up-c'})
+        elif field == 'location':
+            Attachment.objects.filter(id=sample_id.replace('sample_id_', '')).update(location=value)
+            return JsonResponse({'msg': 'up-l'})
+        else:
+            return JsonResponse({'msg': 'error'})
+    elif table == 'downmachine':
+        if field == 'comment':
+            Attachment.objects.filter(id=sample_id.replace('sample_id_', '')).update(comment=vaule)
+            return JsonResponse({'msg': 'do-c'})
+        elif field == 'location':
+            Attachment.objects.filter(id=sample_id.replace('sample_id_', '')).update(location=vaule)
+            return JsonResponse({'msg': 'do-l'})
+        else:
+            return JsonResponse({'msg': 'error'})
+    else:
+        return JsonResponse({'msg': 'error'})
 
 
 '''
@@ -434,67 +499,103 @@ def show_expense_detail(request):
     return JsonResponse(data)
 
 
-def manage_expense_info(request):
+def manage_billing_info(request):
     if request.method == 'POST':
         oper = request.POST['oper']
-        if request.POST.get('billing_number'):
-            table_name = 'billing_info'
-        elif request.POST.get('sample_number'):
-            table_name = 'cost_info'
-        else:
-            table_name = 'receipt_info'
-
         if oper == 'del':
-            if table_name == 'billing_info':
-                BillingInfo.objects.filter(id=request.POST['id']).delete()
-            elif table_name == 'receipt_info':
-                ReceiptInfo.objects.filter(id=request.POST['id']).delete()
-            else:
-                CostInfo.objects.filter(id=request.POST['id']).delete()
-            return HttpResponse({'msg': 'ok'})
+            BillingInfo.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse({'msg': 'delete'})
         elif oper == 'add':
-            if table_name == 'billing_info':
-                new_row = BillingInfo(project_id=request.POST['project_id'],
-                                      project_number=request.POST['project_number'],
-                                      expense=request.POST['expense'],
-                                      billing_number=request.POST['billing_number'],
-                                      time=datetime.datetime.now(),
-                                      comment=request.POST['comment']
-                                      )
-            elif table_name == 'receipt_info':
-                new_row = ReceiptInfo(project_id=request.POST['project_id'],
-                                      project_number=request.POST['project_number'],
-                                      expense=request.POST['expense'],
-                                      time=datetime.datetime.now(),
-                                      comment=request.POST['comment'])
-            else:
-                new_row = CostInfo(project_id=request.POST['project_id'],
-                                   project_number=request.POST['project_number'],
-                                   expense=request.POST['expense'],
-                                   sample_number=request.POST['sample_number'],
-                                   unit_cost=request.POST['unit_cost'],
-                                   time=datetime.datetime.now(),
-                                   comment=request.POST['comment'])
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            new_row = BillingInfo(project_id=project_id,
+                                  project_number=request.POST['project_number'],
+                                  expense=request.POST['expense'],
+                                  billing_number=request.POST['billing_number'],
+                                  time=datetime.datetime.now(),
+                                  comment=request.POST['comment'])
             new_row.save()
-            return HttpResponse({'msg': 'ok'})
+            LogInfo(project_id=project_id,
+                    action=u'添加开票信息',
+                    time=datetime.datetime.now(),
+                    manager=request.session.get('username')).save()
+            return HttpResponse({'msg': 'add'})
         else:
-            if table_name == 'billing_info':
-                BillingInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
-                                                                         billing_number=request.POST['billing_number'],
-                                                                         time=datetime.datetime.now(),
-                                                                         comment=request.POST['comment']
-                                                                         )
-            elif table_name == 'receipt_info':
-                ReceiptInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
-                                                                         time=datetime.datetime.now(),
-                                                                         comment=request.POST['comment'])
-            else:
-                CostInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
-                                                                      sample_number=request.POST['sample_number'],
-                                                                      unit_cost=request.POST['unit_cost'],
-                                                                      time=datetime.datetime.now(),
-                                                                      comment=request.POST['comment'])
-            return HttpResponse({'msg': 'ok'})
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            BillingInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                     billing_number=request.POST['billing_number'],
+                                                                     time=datetime.datetime.now(),
+                                                                     comment=request.POST['comment'])
+            LogInfo(project_id=project_id,
+                    action=u'修改开票信息',
+                    time=datetime.datetime.now(),
+                    manager=request.session.get('username')).save()
+            return HttpResponse({'msg': 'update'})
+
+
+def manage_receipt_info(request):
+    if request.method == 'POST':
+        oper = request.POST['oper']
+        if oper == 'del':
+            ReceiptInfo.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse({'msg': 'delete'})
+        elif oper == 'add':
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            new_row = ReceiptInfo(project_id=project_id,
+                                  project_number=request.POST['project_number'],
+                                  expense=request.POST['expense'],
+                                  time=datetime.datetime.now(),
+                                  comment=request.POST['comment'])
+            new_row.save()
+            LogInfo(project_id=project_id,
+                    action=u'增加收票信息',
+                    time=datetime.datetime.now(),
+                    manager=request.session.get('username')).save()
+            return HttpResponse({'msg': 'add'})
+        else:
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            ReceiptInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                     time=datetime.datetime.now(),
+                                                                     comment=request.POST['comment'])
+            LogInfo(project_id=project_id,
+                    action=u'修改收票信息',
+                    time=datetime.datetime.now(),
+                    manager=request.session.get('username')).save()
+            return HttpResponse({'msg': 'update'})
+
+
+def manage_cost_info(request):
+    if request.method == 'POST':
+        oper = request.POST['oper']
+        if oper == 'del':
+            CostInfo.objects.filter(id=request.POST['id']).delete()
+            return HttpResponse({'msg': 'delete'})
+        elif oper == 'add':
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            new_row = CostInfo(project_id=project_id,
+                               project_number=request.POST['project_number'],
+                               expense=request.POST['expense'],
+                               sample_number=request.POST['sample_number'],
+                               unit_cost=request.POST['unit_cost'],
+                               time=datetime.datetime.now(),
+                               comment=request.POST['comment'])
+            new_row.save()
+            LogInfo(project_id=project_id,
+                    action=u'新增成本信息',
+                    time=datetime.datetime.now(),
+                    manager=request.session.get('username')).save()
+            return HttpResponse({'msg': 'add'})
+        else:
+            project_id = SampleProjectMaster.objects.get(project_number=request.POST['project_number']).id
+            CostInfo.objects.filter(id=request.POST['id']).update(expense=request.POST['expense'],
+                                                                  sample_number=request.POST['sample_number'],
+                                                                  unit_cost=request.POST['unit_cost'],
+                                                                  time=datetime.datetime.now(),
+                                                                  comment=request.POST['comment'])
+            LogInfo(project_id=project_id,
+                    action=u'修改成本信息',
+                    time=datetime.datetime.now(),
+                    manager=request.session.get('username')).save()
+            return HttpResponse({'msg': 'update'})
 
 
 def recover_data(request):
@@ -502,17 +603,34 @@ def recover_data(request):
     table = request.GET.get('table', '')
     project_id = request.GET.get('project_id', '')
     upload_time = request.GET.get('upload_time', '')
-    action = request.GET.get('action', '')
+    # action = request.GET.get('action', '')
 
-    response = check_sample.recover_data(project_id, table, upload_time, action, username)
+    response = check_sample.recover_data(table, upload_time, username, project_id)
     return response
 
 
 def show_project_detail(request):
     project_number = request.GET.get('project_number', '')
-    print 'project_number: ', project_number
+    user = request.GET.get('user', '')
     project_id = get_projec_id_by_project_num(project_number)
     info = get_project_info(project_id)
+    project_info = get_sample_info.get_project_summary(project_id)
+    exp_dict = get_user_cost.check_bill(user, project_id)
 
-    return render(request, 'project_detail.html', {'info': info})
+    return render(request, 'project_detail.html', {'info': info,
+                                                   'exp_dict': exp_dict,
+                                                   'project_number': project_number,
+                                                   'project_info': project_info})
 
+
+def download_summary_info(request):
+    project_number = request.GET.get('project_number', '')
+    project_id = get_projec_id_by_project_num(project_number)
+    file_path = get_sample_info.download_summary_table(project_id)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=%s' % os.path.basename(file_path)
+            return response
+
+    raise Http404
