@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load table_tags %}
 
 {% block content_header %}
 <h1>项目总览<small>我负责的项目</small></h1>
@@ -27,24 +26,27 @@
                 </div> -->
             </div>
             <div class="box-body">
-                <table id="test" class="table table-bordered table-striped">
+                <table id="main-table" class="table table-bordered table-striped">
                   <thead>
                     <tr>
-                        <th>#</th>
                         <th>项目编号</th>
                         <th>客户名称</th>
                         <th>创建时间</th>
-                        <th>状态</th>
+                        <th>备注</th>
+                        <th>项目状态</th>
+                        <th>项目详情</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for project in all_projects %}
                     <tr>
-                        <td>{{project.id}}</td>
+                        <!--<td>{{project.id}}</td>-->
                         <td>{{project.project_number}}</td>
-                        <td>{{project.cust_user}}</td>
+                        <td><a href="/lims_app/show_user_detail?user={{project.cust_user}}">{{project.cust_user}}</td>
                         <td>{{project.create_time}}</td>
-                        <td>{{project.status}}</td>
+                        <td><a href='#' id='{{project.project_number}}' class="comment">{{project.comment}}</a></td>
+                        <td><a href='#' id='{{project.project_number}}' class="status">{{project.status}}</a></td>
+                        <td><button class="btn btn-default btn-view">详情</button></td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -54,7 +56,14 @@
     </div>
 </div>
 {% endblock %}
+{% load staticfiles %}
+
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-editable.css' %}">
+{% endblock %}
+
 {% block page_script %}
+<script src="{% static 'js/bootstrap-editable.js' %}"></script>
 <script>
     $(document).ready(function(){
       {% comment %}
@@ -91,7 +100,96 @@
       }
     })*/
     {% endcomment %}
-      $("#test").DataTable();
+    var table = $("#main-table").DataTable({
+      "fnRowCallback":function(nRow, aData, iDisplayIndex, iDisplayIndexFull){
+        $('.comment').editable({
+           url: '/lims_app/save_sample_info?table=project_info&field=comment',
+           type: 'text',
+           pk: 1,
+           name: this.id,
+           title: '添加备注',
+        });
+        $('.status').editable({
+           url: '/lims_app/save_sample_info?table=project_info&field=status',
+           type: 'text',
+           pk: 1,
+           name: this.id,
+           title: '修改状态',
+        });
+      }
+    })
+    /*
+      var table = $("#main-table").DataTable({
+        "ajax": {
+          url: "{% url 'show_project_master' %}",
+          "type": "POST"
+        },
+        "columns": [
+          {"data": "project_number"},
+          {"data": "cust_user"},
+          {"data": "create_time"},
+          {"data": "comment"},
+          {"data": "status"},
+          {"data": null}
+        ],
+        "columnDefs":[{
+          "targets": -1,
+          "data": null,
+          "defaultContent": '<button class="btn btn-default btn-view">详情</button>'
+        },{
+          "targets": 5,
+          render: function(data, type, row, meta){
+            if(type==='display'){
+              return $('<a>')
+                      .attr('href', '#')
+                      .attr('id', row[0])
+                      .attr('class', 'username')
+                      .text(data)
+                      .wrap('<div></div>')
+                      .parent()
+                      .html();
+            }else{
+              return data;
+            }
+          }
+        },{
+          "targets": 1,
+          render: function(data, type, row, meta){
+            if(type==='display'){
+              return $('<a>')
+                      .attr('href','/lims_app/show_user_detail?user='+data)
+                      .text(data)
+                      .wrap('<div></div>')
+                      .parent()
+                      .html();
+            }else{
+              return data;
+            }
+          }
+        }]
+      });
+      */
+      $("#main-table tbody").on('click', '.btn-view', function(e){
+        var data = table.row($(this).parents('tr')).data();
+        user = data[1].split('>')[1].split('<')[0];
+        window.location.href = "/lims_app/show_project_detail?project_number=" +
+        data[0] + '&user=' + user;
+      });
+      $('.comment').editable({
+         url: '/lims_app/save_sample_info?table=project_info&field=comment',
+         type: 'text',
+         pk: 1,
+         name: this.id,
+         title: '添加备注',
+      });
+      $('.status').editable({
+         url: '/lims_app/save_sample_info?table=project_info&field=status',
+         type: 'text',
+         pk: 1,
+         name: this.id,
+         title: '修改状态',
+      });
+      $("#all_project").addClass('active');
   });
 </script>
 {% endblock %}

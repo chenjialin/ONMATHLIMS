@@ -156,6 +156,7 @@ class SampleProjectMaster(models.Model):
     species = models.CharField(max_length=45, blank=True, null=True)
     project_leader = models.CharField(max_length=45, blank=True, null=True)
     status = models.CharField(max_length=45, blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
     created_by = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.CharField(max_length=45, blank=True, null=True)
     #project_log = models.TextField(blank=True, null=True)
@@ -229,7 +230,7 @@ class UserInfo(models.Model):
     sex = models.CharField(max_length=2, blank=True, null=True)
     role = models.CharField(max_length=45, blank=True, null=True)
     create_time = models.DateTimeField(blank=True, null=True)
-    update_time = models.DateTimeField(blank=True, null=True)
+    update_time = models.CharField(max_length=45, blank=True, null=True)
     status = models.CharField(max_length=45, blank=True, null=True)
     field = models.CharField(max_length=100, blank=True, null=True)
     notes = models.CharField(max_length=200, blank=True, null=True)
@@ -240,3 +241,185 @@ class UserInfo(models.Model):
     class Meta:
         managed = False
         db_table = 'user_info'
+
+
+class Attachment(models.Model):
+    project_id = models.IntegerField()
+    upload_user_id = models.IntegerField()
+    operate_user_id = models.IntegerField()
+    file_type = models.CharField(max_length=45, blank=True, null=True)
+    filename = models.CharField(max_length=200, blank=True, null=True)
+    file_path = models.CharField(max_length=200, blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    location = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=45, blank=True, null=True)
+    upload_time = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'attachment'
+
+
+class SendSample(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, unique=True)
+    sample_name = models.CharField(max_length=45)
+    sample_id = models.CharField(max_length=45, unique=True)
+    species = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
+    express_number = models.CharField(max_length=45, blank=True, null=True)
+    product_num = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
+    status = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'send_sample'
+
+
+class QualityCheck(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, unique=True)
+    sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
+    sample_id = models.CharField(max_length=45, unique=True)
+    concentration = models.CharField(max_length=45, blank=True, null=True)
+    volume = models.CharField(max_length=45, blank=True, null=True)
+    rin = models.CharField(max_length=45, blank=True, null=True)
+    results = models.CharField(max_length=1, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
+    status = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'quality_check'
+
+
+class BuildLib(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, unique=True)
+    sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
+    sample_id = models.CharField(max_length=45, unique=True)
+    lib_id = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
+    status = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'build_lib'
+
+
+class UpMachine(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, unique=True)
+    sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
+    sample_id = models.CharField(max_length=45, unique=True)
+    upmachinetype = models.CharField(max_length=45, blank=True, null=True)
+    mode = models.CharField(max_length=45, blank=True, null=True)
+    data_count = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
+    status = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'upmachine'
+
+
+class DownMachine(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, unique=True)
+    sample_name = models.CharField(max_length=45)
+    om_id = models.CharField(max_length=100)
+    sample_id = models.CharField(max_length=45, unique=True)
+    data_count = models.CharField(max_length=45, blank=True, null=True)
+    q20 = models.CharField(max_length=45, blank=True, null=True)
+    q30 = models.CharField(max_length=45, blank=True, null=True)
+    data_count = models.CharField(max_length=45, blank=True, null=True)
+    create_time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    upload_time = models.CharField(max_length=45, blank=True, null=True)
+    location = models.CharField(max_length=100)
+    status = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'downmachine'
+
+
+class BillingInfo(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.IntegerField(blank=True, null=True)
+    billing_number = models.CharField(max_length=45, blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'billing_info'
+
+
+class ReceiptInfo(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.IntegerField(blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'receipt_info'
+
+
+class CostInfo(models.Model):
+    project_id = models.IntegerField()
+    project_number = models.CharField(max_length=45, blank=True, null=True)
+    expense = models.IntegerField(blank=True, null=True)
+    sample_number = models.CharField(max_length=45, blank=True, null=True)
+    unit_cost = models.CharField(max_length=45, blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'cost_info'
+
+
+class LogInfo(models.Model):
+    project_id = models.IntegerField()
+    action = models.CharField(max_length=45, blank=True, null=True)
+    time = models.DateTimeField(blank=True, null=True)
+    manager = models.CharField(max_length=45, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'project_log_table'
+
+
+class ReturnSample(models.Model):
+    sample_name = models.CharField(max_length=45)
+    # om_id = models.CharField(max_length=100)
+    sample_id = models.CharField(max_length=45)
+    location = models.CharField(max_length=100)
+    time = models.DateTimeField(blank=True, null=True)
+    upload_time = models.CharField(max_length=100, blank=True, null=True)
+    comment = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=1, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'return_sample'
