@@ -215,23 +215,27 @@
 <script src="{%  static "plugins/datatables/jquery.dataTables.min.js" %}"></script>
 <script src="{%  static "plugins/datatables/dataTables.bootstrap.js" %}"></script>
 <script>
-$(document).ready(function(){
-  $("#sample_table > tbody tr").each(function(){
-    var tdArr = $(this).children();
-    var upmachine_data =tdArr.eq(4).text();
-    var downmachine_data = tdArr.eq(5).text();
-    upmachine_data = Number(upmachine_data);
-    downmachine_data = Number(downmachine_data.split('G')[0]);
-    if(upmachine_data > downmachine_data){
-      $(this).addClass('highlight');
-    }
-  });
-});
-var project_number = '{{ project_number }}';
-var table = $("#sample_table").DataTable();
-function down_summary_table(table) {
-  window.location.href = '/lims_app/download_summary_info?project_number=' + project_number;
-}
+$(document).ready(function() {
+    $("#sample_table > tbody tr").each(function () {
+        var tdArr = $(this).children();
+        var upmachine_data = tdArr.eq(4).text();
+        var downmachine_data = tdArr.eq(5).text();
+        if (upmachine_data != 'None' && downmachine_data != 'None') {
+            upmachine_data = Number(upmachine_data);
+            downmachine_data = Number(downmachine_data.split('G')[0]);
+            if (upmachine_data > downmachine_data) {
+                $(this).addClass('highlight');
+            }
+        }
+        ;
+    });
+    var project_number = '{{ project_number }}';
+    var table = $("#sample_table").DataTable();
+
+    function down_summary_table(table) {
+        window.location.href = '/lims_app/download_summary_info?project_number=' + project_number;
+    };
+})
 </script>
 </body>
 </html>
