@@ -127,7 +127,7 @@ def show_project_master(request):
             project_dict = {}
             project_dict['project_number'] = each_project.project_number
             project_dict['create_time'] = each_project.create_time.split(" ")[0]
-            project_dict['status'] = title_map.get(each_project.status)
+            project_dict['status'] = each_project.status
             project_dict['comment'] = each_project.comment
             project_dict['cust_user'] = each_project.cust_user
             all_projects_list.append(project_dict)
@@ -148,7 +148,7 @@ def main(request):
         project_dict = {}
         project_dict['project_number'] = each_project.project_number
         project_dict['create_time'] = each_project.create_time.split(" ")[0]
-        project_dict['status'] = title_map.get(each_project.status)
+        project_dict['status'] = each_project.status
         project_dict['comment'] = each_project.comment
         project_dict['cust_user'] = each_project.cust_user
         all_projects_list.append(project_dict)
